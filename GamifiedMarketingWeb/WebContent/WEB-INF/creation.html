@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<title>Gamified Marketing</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet"
+	href="https://fonts.googleapis.com/css?family=Raleway">
+<style>
+body, h1, h2, h3, h4, h5 {
+	font-family: "Raleway", sans-serif
+}
+
+input {
+	text-align: center;
+}
+</style>
+<body class="w3-light-grey">
+
+
+	<!-- w3-content defines a container for fixed size centered content,
+and is wrapped around the whole page content, except for the footer in this example -->
+	<div class="w3-content" style="max-width: 1400px">
+
+		<!-- Header -->
+		<header class="w3-container w3-center w3-padding-32">
+			<h1>
+				<b>GAMIFIED MARKETING</b>
+			</h1>
+		</header>
+
+		<div class="w3-row">
+
+			<div class="w3-container w3-center">
+				<div class="w3-card w3-margin w3-margin-top">
+					<div class="w3-container w3-white">
+
+						<h4>
+							<form action="creation" enctype='multipart/form-data'
+								method="POST">
+								<fieldset>
+									<p>
+									<h4>Product name:</h4>
+									<input type="text" name="product_name" required />
+									</p>
+
+									<p>
+									<h4>Select image:</h4>
+									<input type="file" id="photoFile" name="picture">
+									</p>
+
+									<p>
+									<h4>Pubblication date:</h4>
+									<input type="date" id="date" name="date" th:value="${date}"
+										required />
+									</p>
+
+									<p>
+									<h4>Number of questions?</h4>
+									<input type="text" id="num_questions" name="num_questions"
+										value="5" size="4"> <a
+										class="w3-button w3-grey w3-padding-large w3-margin-bottom"
+										href="#" id="filldetails" onclick="addFields()">Create
+										question slots</a>
+									<p id="container" />
+									</p>
+
+
+									<input
+										class="w3-button w3-grey w3-padding-large w3-margin-bottom"
+										type="submit" name="Creation" value="Creation">
+								</fieldset>
+							</form>
+						</h4>
+					</div>
+				</div>
+
+			</div>
+
+
+		</div>
+
+	</div>
+
+</body>
+</html>
+
+<script type="text/javascript">
+	function addFields() {
+		// Number of inputs to create
+		var number = document.getElementById("num_questions").value;
+		// Container <div> where dynamic content will be placed
+		var container = document.getElementById("container");
+		// Clear previous contents of the container
+		while (container.hasChildNodes()) {
+			container.removeChild(container.lastChild);
+		}
+		for (i = 0; i < number; i++) {
+			// Append a node with a random text
+			container.appendChild(document
+					.createTextNode("Q " + (i + 1) + ": "));
+			// Create an <input> element, set its type and name attributes
+			var input = document.createElement("input");
+			input.type = "text";
+			input.name = "question_" + i;
+			input.size = "50";
+
+			// some standard questions
+			if (i == 0) {
+				input.value = "Do you know the product?";
+			} else if (i == 1) {
+				input.value = "Have you purchased the product before?";
+			} else if (i == 2) {
+				input.value = "Would you recommend the product to a friend?";
+			}
+
+			container.appendChild(input);
+			// Append a line break 
+			container.appendChild(document.createElement("br"));
+		}
+	}
+</script>
