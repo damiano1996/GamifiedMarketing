@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.ejb.EJB;
 import javax.servlet.RequestDispatcher;
@@ -24,11 +26,15 @@ import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
+import com.derin.damiano.entities.Answer;
+import com.derin.damiano.entities.Product;
+import com.derin.damiano.entities.Question;
 import com.derin.damiano.entities.User;
 import com.derin.damiano.services.ProductService;
+import com.derin.damiano.services.QuestionnaireService;
 import com.derin.damiano.services.UserService;
-
-import utils.ImageUtils;
+import com.derin.damiano.utils.ImageUtils;
+import com.derin.damiano.utils.ServletHandler;
 
 /**
  * Servlet implementation class CreationController
@@ -44,6 +50,9 @@ public class QuestionnaireController extends HttpServlet {
 
 	@EJB(name = "com.derin.damiano.services/ProductService")
 	private ProductService productService;
+
+	@EJB(name = "com.derin.damiano.services/QuestionnaireService")
+	private QuestionnaireService questionnaireService;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -65,61 +74,66 @@ public class QuestionnaireController extends HttpServlet {
 			throws ServletException, IOException {
 
 		HttpSession session = request.getSession();
-		User user = (User) session.getAttribute("user");
-
-		String path = "/WEB-INF/marketing_questionnaire.html";
 		ServletContext servletContext = getServletContext();
-		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
+		WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
 
-		ctx.setVariable("product", productService.getProductOfTheDay());
+		User user = (User) session.getAttribute("user");
+		Product product = (Product) session.getAttribute("product");
 
-		templateEngine.process(path, ctx, response.getWriter());
+		List answers = (ArrayList<Answer>) session.getAttribute("answers");
+		if (answers == null) {
+			answers = new ArrayList<Answer>();
+			for (Question question : product.getQuestions()) {
+				Answer answer = new Answer("fill here", question, user);
+				answers.add(answer);
+			}
+			session.setAttribute("answers", answers);
+		}
 
+		templateEngine.process("/WEB-INF/marketing_questionnaire.html", ctx, response.getWriter());
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// If the user is not logged in (not present in session) redirect to the login
+
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("user");
 
-		String path;
-		if (user.isAdmin()) {
+		ServletContext servletContext = getServletContext();
+		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
 
-			String productName = StringEscapeUtils.escapeJava(request.getParameter("product_name"));
-			String dateString = request.getParameter("date");
-			Date date = null;
-			try {
-				date = new SimpleDateFormat("yyyy-mm-dd").parse(dateString);
-			} catch (ParseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+		Product product = productService.getProductOfTheDay();
+		ctx.setVariable("product", product);
+
+		if (request.getParameter("submit").equals("Next")) {
+
+			for (Answer answer : (ArrayList<Answer>) session.getAttribute("answers")) {
+				String content = StringEscapeUtils
+						.escapeJava(request.getParameter("" + answer.getId().getQuestionId()));
+				answer.setContent(content);
 			}
 
-			Part imgFile = request.getPart("picture");
-			InputStream imgContent = imgFile.getInputStream();
-			byte[] imgByteArray = ImageUtils.readImage(imgContent);
+			templateEngine.process("/WEB-INF/statistical_questionnaire.html", ctx, response.getWriter());
 
-			int numQuestions = Integer.parseInt(StringEscapeUtils.escapeJava(request.getParameter("num_questions")));
+		} else if (request.getParameter("submit").equals("Submit")) {
 
-			String questions[] = new String[numQuestions];
-			for (int i = 0; i < numQuestions; i++) {
-				questions[i] = StringEscapeUtils.escapeJava(request.getParameter("question_" + i));
-			}
+			int age = Integer.parseInt(ServletHandler.getParameter(request, "age"));
+			String sex = StringEscapeUtils.escapeJava(ServletHandler.getParameter(request, "sex"));
+			String expertiseLevel = StringEscapeUtils.escapeJava(ServletHandler.getParameter(request, "expertise_level"));
 
-			productService.addProduct(date, imgByteArray, productName, questions);
+			questionnaireService.addQuestionnaire(user, (ArrayList<Answer>) session.getAttribute("answers"), age, sex, expertiseLevel);
 
-			// redirection to adminhome
-			RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/WEB-INF/adminhome.html");
-			dispatcher.forward(request, response);
+			session.setAttribute("hideQuestionnaireButton", questionnaireService.isQuestionnaireSubmitted(user, (Product) session.getAttribute("product")));
 
-		} else {
+			templateEngine.process("/WEB-INF/home.html", ctx, response.getWriter());
 
-			ServletContext servletContext = getServletContext();
-			WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
-			ctx.setVariable("errorMsg", "Only administrators can perform this action!");
-			path = "/index.html";
-			templateEngine.process(path, ctx, response.getWriter());
+		} else if (request.getParameter("submit").equals("Previous")) {
+
+			session.setAttribute("age", ServletHandler.getParameter(request, "age"));
+			session.setAttribute("sex", ServletHandler.getParameter(request, "sex"));
+			session.setAttribute("expertiseLevel", ServletHandler.getParameter(request, "expertise_level"));
+
+			templateEngine.process("/WEB-INF/marketing_questionnaire.html", ctx, response.getWriter());
 		}
 
 	}

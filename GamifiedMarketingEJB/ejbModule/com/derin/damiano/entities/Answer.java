@@ -31,6 +31,13 @@ public class Answer implements Serializable {
 	public Answer() {
 	}
 
+	public Answer(String content, Question question, User user) {
+		this.id = new AnswerPK(question.getId(), user.getId());
+		this.content = content;
+		this.question = question;
+		this.user = user;
+	}
+
 	public AnswerPK getId() {
 		return this.id;
 	}

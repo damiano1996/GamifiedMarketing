@@ -24,12 +24,15 @@ import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
+import com.derin.damiano.entities.Product;
+import com.derin.damiano.entities.Review;
 import com.derin.damiano.entities.User;
 import com.derin.damiano.services.ProductService;
+import com.derin.damiano.services.QuestionnaireService;
 import com.derin.damiano.services.ReviewService;
 import com.derin.damiano.services.UserService;
-
-import utils.ImageUtils;
+import com.derin.damiano.utils.ImageUtils;
+import com.derin.damiano.utils.ServletHandler;
 
 /**
  * Servlet implementation class CreationController
@@ -48,6 +51,9 @@ public class ReviewController extends HttpServlet {
 
 	@EJB(name = "com.derin.damiano.services/ReviewService")
 	private ReviewService reviewService;
+
+	@EJB(name = "com.derin.damiano.services/QuestionnaireService")
+	private QuestionnaireService questionnaireService;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -69,29 +75,17 @@ public class ReviewController extends HttpServlet {
 			throws ServletException, IOException {
 
 		HttpSession session = request.getSession();
-		User user = (User) session.getAttribute("user");
+		WebContext ctx = new WebContext(request, response, getServletContext(), request.getLocale());
 
-		String reviewContent = null;
-		try {
-			reviewContent = StringEscapeUtils.escapeJava(request.getParameter("review_content"));
-			if (reviewContent == null || reviewContent.isEmpty()) {
-				throw new Exception("Missing or empty review!");
-			}
+		String reviewContent = ServletHandler.getParameter(request, "review_content");
+		if (reviewContent != null) {
 
-		} catch (Exception e) {
-			// for debugging only e.printStackTrace();
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing review value");
-			return;
+			Product product = (Product) session.getAttribute("product");
+			reviewService.addReview(product, (User) session.getAttribute("user"), reviewContent);
 		}
 
-		reviewService.addReview(productService.getProductOfTheDay(), user, reviewContent);
-		
-		
-		// return home page again
-		ServletContext servletContext = getServletContext();
-		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
-		ctx.setVariable("product", productService.getProductOfTheDay());
 		templateEngine.process("/WEB-INF/home.html", ctx, response.getWriter());
+
 	}
 
 	public void destroy() {

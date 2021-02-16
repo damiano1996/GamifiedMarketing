@@ -37,43 +37,64 @@ and is wrapped around the whole page content, except for the footer in this exam
 			<h1>
 				<b>GAMIFIED MARKETING</b>
 			</h1>
+			<h4>Admin Home</h4>
 		</header>
 
 
 		<div class="w3-row">
 
-			<div class="w3-container w3-center">
-				<div class="w3-card w3-margin w3-margin-top">
-					<table>
-						<tr>
-							<td>
+			<div class="w3-col s3 w3-center">
+				<p></p>
+			</div>
+
+
+			<div class="w3-col s6 w3-center">
+				<div class="w3-container w3-center">
+					<div class="w3-card w3-margin w3-margin-top w3-padding-32">
+
+						<div class="w3-row">
+							<div class="w3-col s3 w3-center">
+
 								<form action="creation" method="GET">
 									<input
 										class="w3-button w3-grey w3-padding-large w3-margin-bottom"
 										type="submit" name="Creation" value="Creation">
 								</form>
+							</div>
+							<div class="w3-col s3 w3-center">
 
-							</td>
-							<td>
 								<form action="inspection" method="POST">
 									<input
 										class="w3-button w3-grey w3-padding-large w3-margin-bottom"
 										type="submit" name="Inspection" value="Inspection">
 								</form>
 
-							</td>
-							<td>
+							</div>
+							<div class="w3-col s3 w3-center">
 								<form action="deletion" method="POST">
 									<input
 										class="w3-button w3-grey w3-padding-large w3-margin-bottom"
 										type="submit" name="Deletion" value="Deletion">
 								</form>
-							</td>
-						</tr>
-
-					</table>
+							</div>
+							<div class="w3-col s3 w3-center">
+								<form action="logout" method="GET">
+									<input
+										class="w3-button w3-grey w3-padding-large w3-margin-bottom"
+										type="submit" name="Log Out" value="Log Out">
+								</form>
+							</div>
+							</tr>
+						</div>
+					</div>
 				</div>
 			</div>
+
+
+			<div class="w3-col s3 w3-center">
+				<p></p>
+			</div>
+
 		</div>
 
 	</div>

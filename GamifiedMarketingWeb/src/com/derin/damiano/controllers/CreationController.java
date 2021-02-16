@@ -27,8 +27,8 @@ import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 import com.derin.damiano.entities.User;
 import com.derin.damiano.services.ProductService;
 import com.derin.damiano.services.UserService;
-
-import utils.ImageUtils;
+import com.derin.damiano.utils.ImageUtils;
+import com.derin.damiano.utils.ServletHandler;
 
 /**
  * Servlet implementation class CreationController
@@ -38,6 +38,8 @@ import utils.ImageUtils;
 public class CreationController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private TemplateEngine templateEngine;
+
+	private final String DATE_FORMAT = "yyyy-MM-dd";
 
 	@EJB(name = "com.derin.damiano.services/UserService")
 	private UserService userService;
@@ -67,27 +69,23 @@ public class CreationController extends HttpServlet {
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("user");
 
+		WebContext ctx = new WebContext(request, response, getServletContext(), request.getLocale());
+
+		String path = null;
+
 		if (user.isAdmin()) {
 
-			// RequestDispatcher dispatcher =
-			// getServletContext().getRequestDispatcher("/WEB-INF/creation.html");
-			// dispatcher.forward(request, response);
-
-			String path = "/WEB-INF/creation.html";
-			ServletContext servletContext = getServletContext();
-			final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
-
-			ctx.setVariable("date", new SimpleDateFormat("YYYY-MM-DD").format(new Date()));
-
-			templateEngine.process(path, ctx, response.getWriter());
+			ctx.setVariable("date", new SimpleDateFormat(DATE_FORMAT).format(new Date()));
+			path = "/WEB-INF/creation.html";
 
 		} else {
 
-			ServletContext servletContext = getServletContext();
-			WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
 			ctx.setVariable("errorMsg", "Only administrators can perform this action!");
-			templateEngine.process("/index.html", ctx, response.getWriter());
+			path = "/WEB-INF/error.html";
 		}
+
+		templateEngine.process(path, ctx, response.getWriter());
+
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -96,44 +94,49 @@ public class CreationController extends HttpServlet {
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("user");
 
+		WebContext ctx = new WebContext(request, response, getServletContext(), request.getLocale());
+
 		String path;
 		if (user.isAdmin()) {
 
-			String productName = StringEscapeUtils.escapeJava(request.getParameter("product_name"));
-			String dateString = request.getParameter("date");
+			String productName = ServletHandler.getParameter(request, "product_name");
+			String dateString = ServletHandler.getParameter(request, "date");
 			Date date = null;
 			try {
-				date = new SimpleDateFormat("yyyy-mm-dd").parse(dateString);
+				date = new SimpleDateFormat(DATE_FORMAT).parse(dateString);
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
-			Part imgFile = request.getPart("picture");
-			InputStream imgContent = imgFile.getInputStream();
-			byte[] imgByteArray = ImageUtils.readImage(imgContent);
+			if (productName != null && dateString != null) {
 
-			int numQuestions = Integer.parseInt(StringEscapeUtils.escapeJava(request.getParameter("num_questions")));
+				Part imgFile = request.getPart("picture");
+				InputStream imgContent = imgFile.getInputStream();
+				byte[] imgByteArray = ImageUtils.readImage(imgContent);
 
-			String questions[] = new String[numQuestions];
-			for (int i = 0; i < numQuestions; i++) {
-				questions[i] = StringEscapeUtils.escapeJava(request.getParameter("question_" + i));
+				int numQuestions = Integer.parseInt(ServletHandler.getParameter(request, "num_questions"));
+
+				String questions[] = new String[numQuestions];
+				for (int i = 0; i < numQuestions; i++) {
+					questions[i] = ServletHandler.getParameter(request, "question_" + i);
+				}
+
+				productService.addProduct(date, imgByteArray, productName, questions);
+
+				path = "/WEB-INF/adminhome.html";
+			} else {
+				ctx.setVariable("errorMsg", "Something went wrong...");
+				path = "/WEB-INF/error.html";
 			}
-
-			productService.addProduct(date, imgByteArray, productName, questions);
-
-			// redirection to adminhome
-			RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/WEB-INF/adminhome.html");
-			dispatcher.forward(request, response);
 
 		} else {
 
-			ServletContext servletContext = getServletContext();
-			WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
 			ctx.setVariable("errorMsg", "Only administrators can perform this action!");
-			path = "/index.html";
-			templateEngine.process(path, ctx, response.getWriter());
+			path = "/WEB-INF/error.html";
 		}
+
+		templateEngine.process(path, ctx, response.getWriter());
 
 	}
 

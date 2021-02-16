@@ -27,56 +27,46 @@ and is wrapped around the whole page content, except for the footer in this exam
 			<h1>
 				<b>GAMIFIED MARKETING</b>
 			</h1>
+			<h4>Creation</h4>
 		</header>
 
 		<div class="w3-row">
 
 			<div class="w3-container w3-center">
-				<div class="w3-card w3-margin w3-margin-top">
-					<div class="w3-container w3-white">
+				<div class="w3-card w3-margin w3-margin-top w3-padding-32">
 
-						<h4>
-							<form action="creation" enctype='multipart/form-data'
-								method="POST">
-								<fieldset>
-									<p>
-									<h4>Product name:</h4>
-									<input type="text" name="product_name" required />
-									</p>
+					<form action="creation" enctype='multipart/form-data' method="POST">
+						<p>
+						<h4>Product name:</h4>
+						<input type="text" name="product_name" required />
+						</p>
 
-									<p>
-									<h4>Select image:</h4>
-									<input type="file" id="photoFile" name="picture">
-									</p>
+						<p>
+						<h4>Select image:</h4>
+						<input type="file" id="photoFile" name="picture">
+						</p>
 
-									<p>
-									<h4>Pubblication date:</h4>
-									<input type="date" id="date" name="date" th:value="${date}"
-										required />
-									</p>
+						<p>
+						<h4>Pubblication date:</h4>
+						<input type="date" id="date" name="date" th:value="${date}"
+							required />
+						</p>
 
-									<p>
-									<h4>Number of questions?</h4>
-									<input type="text" id="num_questions" name="num_questions"
-										value="5" size="4"> <a
-										class="w3-button w3-grey w3-padding-large w3-margin-bottom"
-										href="#" id="filldetails" onclick="addFields()">Create
-										question slots</a>
-									<p id="container" />
-									</p>
+						<p>
+						<h4>Number of questions?</h4>
+						<input type="text" id="num_questions" name="num_questions"
+							value="5" size="4"> <a
+							class="w3-button w3-grey w3-padding-large w3-margin-bottom"
+							href="#" id="filldetails" onclick="addFields()">Create
+							question slots</a>
+						<p id="container" />
+						</p>
 
-
-									<input
-										class="w3-button w3-grey w3-padding-large w3-margin-bottom"
-										type="submit" name="Creation" value="Creation">
-								</fieldset>
-							</form>
-						</h4>
-					</div>
+						<input class="w3-button w3-grey w3-padding-large w3-margin-bottom"
+							type="submit" name="Save" value="Save">
+					</form>
 				</div>
-
 			</div>
-
 
 		</div>
 

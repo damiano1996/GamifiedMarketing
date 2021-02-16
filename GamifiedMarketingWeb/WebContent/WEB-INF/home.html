@@ -28,16 +28,17 @@ and is wrapped around the whole page content, except for the footer in this exam
 				<b>GAMIFIED MARKETING</b>
 			</h1>
 			<p class="w3-tag"
-				th:text="${'Welcome back ' + session.user.username + '!'}"></p>
+				th:text="${'Welcome back ' + session.user.getUsername() + '!'}"></p>
 		</header>
 
 		<div class="w3-row">
 
 			<div class="w3-col l8 s12">
 
-				<div class="w3-card-4 w3-margin w3-whitep">
+				<div class="w3-card-4 w3-margin w3-white">
 
-					<img th:src="*{'data:image/png;base64,'+ product.getImageData()}"
+					<img
+						th:src="*{'data:image/png;base64,'+ session.product.getImageData()}"
 						style="width: 100%">
 
 					<div class="w3-container">
@@ -47,32 +48,8 @@ and is wrapped around the whole page content, except for the footer in this exam
 						</h5>
 
 						<h2>
-							<b><p th:text="${product.name}"></p></b>
+							<b><p th:text="${session.product.getName()}"></p></b>
 						</h2>
-
-						<div class="w3-container">
-
-							<form action="review" method="POST">
-								<p>
-									We appreciate your opinion. Leave your review:<br>
-									<textarea name="review_content" rows="3" maxlength="200"
-										style="width: 100%"></textarea>
-								</p>
-
-								<input
-									class="w3-button w3-grey w3-padding-large w3-margin-bottom"
-									type="submit" name="Save" value="Save">
-							</form>
-						</div>
-
-						<div class="w3-container">
-
-							<form action="questionnaire" method="GET">
-								<input
-									class="w3-button w3-grey w3-padding-large w3-margin-bottom"
-									type="submit" name="Questionnaire" value="Questionnaire">
-							</form>
-						</div>
 
 					</div>
 				</div>
@@ -81,20 +58,68 @@ and is wrapped around the whole page content, except for the footer in this exam
 
 			<div class="w3-col l4">
 
-				<div class="w3-card-4 w3-margin w3-whitep">
+				<div class="w3-card-4 w3-margin">
 
-					<div class="w3-container">
+					<div class="w3-row">
+						<div class="w3-col s4" th:if="${!session.hideQuestionnaireButton}">
+							<div class="w3-container w3-padding-32 w3-center">
+								<form action="questionnaire" method="GET">
+									<input class="w3-button w3-grey" type="submit"
+										name="Questionnaire" value="Questionnaire">
+								</form>
+							</div>
+						</div>
 
-						<h5>
-							<b>Reviews:</b>
-						</h5>
+						<div class="w3-col s4">
+							<div class="w3-container w3-padding-32 w3-center">
+								<form action="leaderboard" method="GET">
+									<input class="w3-button w3-grey" type="submit"
+										name="Leaderboard" value="Leaderboard">
+								</form>
+							</div>
+						</div>
+						<div class="w3-col s4">
+							<div class="w3-container w3-padding-32 w3-center">
+								<form action="logout" method="GET">
+									<input class="w3-button w3-grey" type="submit" name="Log Out"
+										value="Log Out">
+								</form>
+							</div>
+						</div>
+					</div>
 
-						<table>
-							<tr th:each="review : ${product.getReviews()}">
-								<td><p
-										th:text="${'By ' + review.getUser().getUsername() + ': ' + review.getContent()}"></p></td>
-							</tr>
-						</table>
+				</div>
+
+				<div class="w3-card-4 w3-margin">
+
+					<div class="w3-container w3-padding-32">
+
+						<h4>
+							<b>Reviews</b>
+						</h4>
+
+						<form action="review" method="POST"
+							th:if="${!session.hideReviewButton}">
+							<p>
+								We appreciate your opinion. Leave your review:<br>
+								<textarea name="review_content" rows="3" maxlength="200"
+									style="width: 100%"></textarea>
+							</p>
+
+							<input
+								class="w3-button w3-grey w3-padding-large w3-margin-bottom"
+								type="submit" name="Save" value="Save">
+						</form>
+
+						<h4>
+							<b>By other users:</b>
+						</h4>
+
+						<u1 class="w3-ul w3-hoverable w3-white"
+							th:each="review : ${session.product.getReviews()}">
+						<li class="w3-padding-16 w3-white"><p
+								th:text="${'By ' + review.getUser().getUsername() + ': ' + review.getContent()}"></p></li>
+						</u1>
 
 					</div>
 				</div>

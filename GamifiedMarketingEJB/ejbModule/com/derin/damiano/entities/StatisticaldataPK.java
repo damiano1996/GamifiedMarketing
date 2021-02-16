@@ -1,6 +1,8 @@
 package com.derin.damiano.entities;
 
 import java.io.Serializable;
+import java.util.Date;
+
 import javax.persistence.*;
 
 /**
@@ -20,6 +22,11 @@ public class StatisticaldataPK implements Serializable {
 	private int userId;
 
 	public StatisticaldataPK() {
+	}
+	
+	public StatisticaldataPK(Date productDate, int userId) {
+		this.productDate = productDate;
+		this.userId = userId;
 	}
 
 	public java.util.Date getProductDate() {

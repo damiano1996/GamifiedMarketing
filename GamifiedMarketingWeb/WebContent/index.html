@@ -31,17 +31,24 @@ and is wrapped around the whole page content, except for the footer in this exam
 
 		<div class="w3-row">
 
-			<div class="w3-container w3-center">
-				<div class="w3-card w3-margin w3-margin-top">
-					<br>
-					<p>Login now to learn more about the product of the day!</p>
-					<br>
-					<div class="w3-container w3-white">
-						<h4>
-							<b>Insert your credentials:</b>
-						</h4>
-						<form action="checklogin" method="POST">
-							<fieldset>
+			<div class="w3-col s2 w3-center">
+				<p></p>
+			</div>
+
+			<div class="w3-col s8 w3-center">
+				<div class="w3-container w3-center">
+
+					<div class="w3-card w3-margin w3-margin-top w3-padding-32">
+						<h5>
+							<p>Login now to learn more about the product of the day!</p>
+						</h5>
+
+						<div class="w3-container w3-white">
+							<h4>
+								<p>Insert your credentials:</p>
+							</h4>
+
+							<form action="login" method="POST">
 								<p>
 								<h4>Username:</h4>
 								<input type="text" name="username" required />
@@ -54,20 +61,20 @@ and is wrapped around the whole page content, except for the footer in this exam
 								<input
 									class="w3-button w3-black w3-padding-large w3-margin-bottom"
 									type="submit" name="LogIn" value="login">
-							</fieldset>
-						</form>
-					</div>
-					<div class="w3-container w3-white">
+							</form>
 
-						<h4>
-							<a href="signup.html"><b>Not registered yet?</b></a>
-						</h4>
+							<h4>
+								<a href="signup.html"><b>Not registered yet?</b></a>
+							</h4>
+						</div>
 					</div>
 
 				</div>
-
 			</div>
 
+			<div class="w3-col s2 w3-center">
+				<p></p>
+			</div>
 
 		</div>
 

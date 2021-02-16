@@ -3,14 +3,13 @@ package com.derin.damiano.entities;
 import java.io.Serializable;
 import javax.persistence.*;
 
-
 /**
  * The persistent class for the statisticaldata database table.
  * 
  */
 @Entity
 @Table(name = "statisticaldata", schema = "db_gamified_marketing")
-@NamedQuery(name="Statisticaldata.findAll", query="SELECT s FROM Statisticaldata s")
+@NamedQuery(name = "Statisticaldata.findAll", query = "SELECT s FROM Statisticaldata s")
 public class Statisticaldata implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -19,21 +18,30 @@ public class Statisticaldata implements Serializable {
 
 	private int age;
 
-	@Column(name="expertise_level")
+	@Column(name = "expertise_level")
 	private String expertiseLevel;
 
 	private String sex;
 
-	//bi-directional many-to-one association to Product
+	// bi-directional many-to-one association to Product
 	@ManyToOne
 	private Product product;
 
-	//bi-directional many-to-one association to User
+	// bi-directional many-to-one association to User
 	@ManyToOne
-	@JoinColumn(name="user_id")
+	@JoinColumn(name = "user_id")
 	private User user;
 
 	public Statisticaldata() {
+	}
+
+	public Statisticaldata(int age, String sex, String expertiseLevel, Product product, User user) {
+		this.id = new StatisticaldataPK(product.getDate(), user.getId());
+		this.age = age;
+		this.expertiseLevel = expertiseLevel;
+		this.sex = sex;
+		this.product = product;
+		this.user = user;
 	}
 
 	public StatisticaldataPK getId() {

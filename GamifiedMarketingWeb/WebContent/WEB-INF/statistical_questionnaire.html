@@ -37,7 +37,7 @@ and is wrapped around the whole page content, except for the footer in this exam
 
 				<div class="w3-card-4 w3-margin w3-white">
 
-					<img th:src="*{'data:image/png;base64,'+ session.product.getImageData()}"
+					<img th:src="*{'data:image/png;base64,'+ product.getImageData()}"
 						style="width: 100%">
 
 					<div class="w3-container">
@@ -47,7 +47,7 @@ and is wrapped around the whole page content, except for the footer in this exam
 						</h5>
 
 						<h2>
-							<b><p th:text="${session.product.getName()}"></p></b>
+							<b><p th:text="${product.name}"></p></b>
 						</h2>
 					</div>
 				</div>
@@ -61,19 +61,39 @@ and is wrapped around the whole page content, except for the footer in this exam
 
 						<form action="questionnaire" method="POST">
 							<h4>
-								<b>Marketing Questions</b>
+								<b>Statistical Data</b>
 							</h4>
 
-							<u1 class="w3-ul w3-hoverable w3-white"
-								th:each="answer : ${session.answers}">
-							<li class="w3-padding-16 w3-white"><p
-									th:text="${'Q: ' + answer.getQuestion().getContent()}"></p> <input
-								type="text" th:name="${answer.getId().getQuestionId()}"
-								th:value="${answer.getContent()}" style="width: 100%" required></li>
+							<u1 class="w3-ul w3-hoverable w3-white">
+							<li class="w3-padding-16 w3-white">Age:<input type="text"
+								name="age" th:value="${session.age}" style="width: 100%"></li>
+							<li class="w3-padding-16 w3-white">Sex:<input type="text"
+								name="sex" th:value="${session.sex}" style="width: 100%"></li>
+							<li class="w3-padding-16 w3-white">Expertise Level:<input
+								type="text" name="expertise_level" th:value="${session.expertiseLevel}"
+								style="width: 100%"></li>
 							</u1>
-							<br> <input
-								class="w3-button w3-grey w3-padding-large w3-margin-bottom"
-								type="submit" name="submit" value="Next">
+							<br>
+
+							<div class="w3-row">
+								<div class="w3-col s4">
+									<input
+										class="w3-button w3-grey w3-padding-large w3-margin-bottom"
+										type="submit" name="submit" value="Previous">
+								</div>
+
+								<div class="w3-col s4">
+									<input
+										class="w3-button w3-grey w3-padding-large w3-margin-bottom"
+										type="submit" name="submit" value="Cancel">
+								</div>
+
+								<div class="w3-col s4">
+									<input
+										class="w3-button w3-grey w3-padding-large w3-margin-bottom"
+										type="submit" name="submit" value="Submit">
+								</div>
+							</div>
 						</form>
 					</div>
 				</div>

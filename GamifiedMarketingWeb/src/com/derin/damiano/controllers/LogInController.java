@@ -19,12 +19,16 @@ import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
+import com.derin.damiano.entities.Product;
 import com.derin.damiano.entities.Review;
 import com.derin.damiano.entities.User;
 import com.derin.damiano.services.ProductService;
+import com.derin.damiano.services.QuestionnaireService;
+import com.derin.damiano.services.ReviewService;
 import com.derin.damiano.services.UserService;
+import com.derin.damiano.utils.ServletHandler;
 
-@WebServlet("/checklogin")
+@WebServlet("/login")
 public class LogInController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private TemplateEngine templateEngine;
@@ -34,6 +38,12 @@ public class LogInController extends HttpServlet {
 
 	@EJB(name = "com.derin.damiano.services/ProductService")
 	private ProductService productService;
+
+	@EJB(name = "com.derin.damiano.services/QuestionnaireService")
+	private QuestionnaireService questionnaireService;
+
+	@EJB(name = "com.derin.damiano.services/ReviewService")
+	private ReviewService reviewService;
 
 	public LogInController() {
 		super();
@@ -50,70 +60,61 @@ public class LogInController extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// obtain and escape params
-		String username = null;
-		String password = null;
-		try {
-			username = StringEscapeUtils.escapeJava(request.getParameter("username"));
-			password = StringEscapeUtils.escapeJava(request.getParameter("password"));
-			if (username == null || password == null || username.isEmpty() || password.isEmpty()) {
-				throw new Exception("Missing or empty credential value");
-			}
 
-		} catch (Exception e) {
-			// for debugging only e.printStackTrace();
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing credential value");
+		WebContext ctx = new WebContext(request, response, getServletContext(), request.getLocale());
+
+		String username = ServletHandler.getParameter(request, "username");
+		String password = ServletHandler.getParameter(request, "password");
+		if (username == null || password == null) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing credential value.");
 			return;
 		}
 
 		User user;
 		try {
-			// query db to authenticate for user
 			user = userService.checkCredentials(username, password);
 		} catch (Exception e) {
 			e.printStackTrace();
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Could not check credentials");
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Could not check credentials.");
 			return;
 		}
-
-		// If the user exists, add info to the session and go to home page, otherwise
-		// show login page with error message
 
 		String path;
 
 		if (user == null) {
-			ServletContext servletContext = getServletContext();
-			WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
+
 			ctx.setVariable("errorMsg", "Incorrect username or password");
-			path = "/index.html";
-			templateEngine.process(path, ctx, response.getWriter());
+			path = "/WEB-INF/error.html";
 
 		} else {
-
-			ServletContext servletContext = getServletContext();
-			final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
 
 			request.getSession().setAttribute("user", user);
 
 			if (user.isAdmin()) {
-				path = /* getServletContext().getContextPath() + */ "/WEB-INF/adminhome.html";
+				path = "/WEB-INF/adminhome.html";
 			} else {
-				path = "/WEB-INF/home.html";
-				ctx.setVariable("product", productService.getProductOfTheDay());
+
+				Product product = productService.getProductOfTheDay();
+
+				if (product != null) {
+
+					request.getSession().setAttribute("product", product);
+					request.getSession().setAttribute("hideQuestionnaireButton",
+							questionnaireService.isQuestionnaireSubmitted(user, product));
+					request.getSession().setAttribute("hideReviewButton",
+							reviewService.isReviewSubmitted(user, product));
+
+					path = "/WEB-INF/home.html";
+
+				} else {
+					path = "/WEB-INF/no_product_today.html";
+				}
 
 			}
 
-			for (Review review : productService.getProductOfTheDay().getReviews()) {
-				System.out.println("Review by: " + review.getUser().getUsername() + " --> " + review.getContent());
-			}
-
-			// from web solution:
-			// RequestDispatcher dispatcher =
-			// getServletContext().getRequestDispatcher(path);
-			// dispatcher.forward(request, response);
-
-			templateEngine.process(path, ctx, response.getWriter());
 		}
+
+		templateEngine.process(path, ctx, response.getWriter());
 
 	}
 
