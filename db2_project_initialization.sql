@@ -18,7 +18,7 @@ create table `UserTable` (
     primary key (`id`)
 );
 
-insert into `UserTable` (`username`, `email`, `password`, `name`, `surname`, `admin`) values ('dami', 'damiano.derin@mail.polimi.it', 'pass', 'damiano', 'derin', true);
+insert into `UserTable` (`username`, `email`, `password`, `name`, `surname`, `admin`) values ('admin', 'admin@admin.admin', 'admin', 'admin', 'admin', true);
 
 drop table if exists `LogInHistory`;
 create table `LogInHistory` (

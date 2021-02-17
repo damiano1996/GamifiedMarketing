@@ -84,7 +84,7 @@ public class QuestionnaireController extends HttpServlet {
 		if (answers == null) {
 			answers = new ArrayList<Answer>();
 			for (Question question : product.getQuestions()) {
-				Answer answer = new Answer("fill here", question, user);
+				Answer answer = new Answer("", question, user);
 				answers.add(answer);
 			}
 			session.setAttribute("answers", answers);
@@ -99,11 +99,9 @@ public class QuestionnaireController extends HttpServlet {
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("user");
 
-		ServletContext servletContext = getServletContext();
-		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
+		WebContext ctx = new WebContext(request, response, getServletContext(), request.getLocale());
 
-		Product product = productService.getProductOfTheDay();
-		ctx.setVariable("product", product);
+//		try {
 
 		if (request.getParameter("submit").equals("Next")) {
 
@@ -119,13 +117,16 @@ public class QuestionnaireController extends HttpServlet {
 
 			int age = Integer.parseInt(ServletHandler.getParameter(request, "age"));
 			String sex = StringEscapeUtils.escapeJava(ServletHandler.getParameter(request, "sex"));
-			String expertiseLevel = StringEscapeUtils.escapeJava(ServletHandler.getParameter(request, "expertise_level"));
+			String expertiseLevel = StringEscapeUtils
+					.escapeJava(ServletHandler.getParameter(request, "expertise_level"));
 
-			questionnaireService.addQuestionnaire(user, (ArrayList<Answer>) session.getAttribute("answers"), age, sex, expertiseLevel);
+			questionnaireService.addQuestionnaire(user, (ArrayList<Answer>) session.getAttribute("answers"), age, sex,
+					expertiseLevel);
 
-			session.setAttribute("hideQuestionnaireButton", questionnaireService.isQuestionnaireSubmitted(user, (Product) session.getAttribute("product")));
+			session.setAttribute("hideQuestionnaireButton",
+					questionnaireService.isQuestionnaireSubmitted(user, (Product) session.getAttribute("product")));
 
-			templateEngine.process("/WEB-INF/home.html", ctx, response.getWriter());
+			templateEngine.process("/WEB-INF/thanks.html", ctx, response.getWriter());
 
 		} else if (request.getParameter("submit").equals("Previous")) {
 
@@ -134,7 +135,17 @@ public class QuestionnaireController extends HttpServlet {
 			session.setAttribute("expertiseLevel", ServletHandler.getParameter(request, "expertise_level"));
 
 			templateEngine.process("/WEB-INF/marketing_questionnaire.html", ctx, response.getWriter());
+
+		} else if (request.getParameter("submit").equals("Cancel")) {
+			templateEngine.process("/WEB-INF/home.html", ctx, response.getWriter());
+
 		}
+
+//		} catch (Exception e) {
+//			ctx.setVariable("message", "Something went wrong with your questionnaire...");
+//			templateEngine.process("/WEB-INF/message.html", ctx, response.getWriter());
+//
+//		}
 
 	}
 

@@ -80,8 +80,8 @@ public class CreationController extends HttpServlet {
 
 		} else {
 
-			ctx.setVariable("errorMsg", "Only administrators can perform this action!");
-			path = "/WEB-INF/error.html";
+			ctx.setVariable("message", "Only administrators can perform this action!");
+			path = "/WEB-INF/message.html";
 		}
 
 		templateEngine.process(path, ctx, response.getWriter());
@@ -126,14 +126,14 @@ public class CreationController extends HttpServlet {
 
 				path = "/WEB-INF/adminhome.html";
 			} else {
-				ctx.setVariable("errorMsg", "Something went wrong...");
-				path = "/WEB-INF/error.html";
+				ctx.setVariable("message", "Something went wrong...");
+				path = "/WEB-INF/message.html";
 			}
 
 		} else {
 
-			ctx.setVariable("errorMsg", "Only administrators can perform this action!");
-			path = "/WEB-INF/error.html";
+			ctx.setVariable("message", "Only administrators can perform this action!");
+			path = "/WEB-INF/message.html";
 		}
 
 		templateEngine.process(path, ctx, response.getWriter());

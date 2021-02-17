@@ -78,13 +78,39 @@ public class ReviewController extends HttpServlet {
 		WebContext ctx = new WebContext(request, response, getServletContext(), request.getLocale());
 
 		String reviewContent = ServletHandler.getParameter(request, "review_content");
+		System.out.println("New review: " + reviewContent);
+
+		String path = null;
 		if (reviewContent != null) {
 
 			Product product = (Product) session.getAttribute("product");
-			reviewService.addReview(product, (User) session.getAttribute("user"), reviewContent);
+
+			try {
+				reviewService.addReview(product, (User) session.getAttribute("user"), reviewContent);
+
+				boolean hide = reviewService.isReviewSubmitted((User) session.getAttribute("user"),
+						(Product) session.getAttribute("product"));
+				System.out.println("isReviewSubmitted: " + hide);
+
+				session.setAttribute("hideReviewButton", hide);
+
+				path = "/WEB-INF/home.html";
+
+			} catch (Exception e) {
+				e.printStackTrace();
+//				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Only one comment per product!");
+				ctx.setVariable("message", "Only one comment per product!");
+				path = "/WEB-INF/message.html";
+//				return;
+			}
+
+		} else {
+
+			ctx.setVariable("message", "Something went wrong with your comment...");
+			path = "/WEB-INF/message.html";
 		}
 
-		templateEngine.process("/WEB-INF/home.html", ctx, response.getWriter());
+		templateEngine.process(path, ctx, response.getWriter());
 
 	}
 

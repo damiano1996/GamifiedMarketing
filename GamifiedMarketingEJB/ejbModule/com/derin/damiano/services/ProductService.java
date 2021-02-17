@@ -34,15 +34,18 @@ public class ProductService {
 		entityManager.persist(product);
 
 		for (String question : questions) {
-			entityManager.persist(new Question(product, question));
+			Question questionObj = new Question(product, question);
+			product.addQuestion(questionObj);
+
+			entityManager.persist(questionObj);
 		}
 	}
 
 	public Product getProductOfTheDay() {
 		Product product = null;
 		try {
-			product = entityManager.createNamedQuery("Product.productByDate", Product.class)
-					.setParameter(1, new Date()).getSingleResult();
+			product = entityManager.createNamedQuery("Product.productByDate", Product.class).setParameter(1, new Date())
+					.getSingleResult();
 
 		} catch (PersistenceException e) {
 		}

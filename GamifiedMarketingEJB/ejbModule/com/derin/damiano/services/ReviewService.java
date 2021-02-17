@@ -30,7 +30,11 @@ public class ReviewService {
 	}
 
 	public void addReview(Product product, User author, String content) {
-		entityManager.persist(new Review(product, author, content));
+		Review review = new Review(product, author, content);
+		author.addReview(review);
+		product.addReview(review);
+
+		entityManager.persist(review);
 	}
 
 	public boolean isReviewSubmitted(User user, Product product) {

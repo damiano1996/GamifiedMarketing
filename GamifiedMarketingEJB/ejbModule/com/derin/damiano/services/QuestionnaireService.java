@@ -35,11 +35,18 @@ public class QuestionnaireService {
 	public void addQuestionnaire(User user, List<Answer> answers, int age, String sex, String expertiseLevel) {
 		for (Answer answer : answers) {
 			if (!answer.getContent().equals("")) {
+				user.addAnswer(answer);
+				answer.getQuestion().addAnswer(answer);
+				
 				entityManager.persist(answer);
 			}
 		}
-		entityManager.persist(
-				new Statisticaldata(age, sex, expertiseLevel, answers.get(0).getQuestion().getProduct(), user));
+		
+		Statisticaldata statisticaldata = new Statisticaldata(age, sex, expertiseLevel, answers.get(0).getQuestion().getProduct(), user);
+		user.addStatisticaldata(statisticaldata);
+		statisticaldata.getProduct().addStatisticaldata(statisticaldata);
+		
+		entityManager.persist(statisticaldata);
 	}
 
 	public boolean isQuestionnaireSubmitted(User user, Product product) {

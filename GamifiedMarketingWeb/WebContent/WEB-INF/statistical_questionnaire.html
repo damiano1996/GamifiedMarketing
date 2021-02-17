@@ -37,7 +37,8 @@ and is wrapped around the whole page content, except for the footer in this exam
 
 				<div class="w3-card-4 w3-margin w3-white">
 
-					<img th:src="*{'data:image/png;base64,'+ product.getImageData()}"
+					<img
+						th:src="*{'data:image/png;base64,'+ session.product.getImageData()}"
 						style="width: 100%">
 
 					<div class="w3-container">
@@ -47,7 +48,7 @@ and is wrapped around the whole page content, except for the footer in this exam
 						</h5>
 
 						<h2>
-							<b><p th:text="${product.name}"></p></b>
+							<b><p th:text="${session.product.getName()}"></p></b>
 						</h2>
 					</div>
 				</div>
@@ -65,13 +66,27 @@ and is wrapped around the whole page content, except for the footer in this exam
 							</h4>
 
 							<u1 class="w3-ul w3-hoverable w3-white">
-							<li class="w3-padding-16 w3-white">Age:<input type="text"
-								name="age" th:value="${session.age}" style="width: 100%"></li>
-							<li class="w3-padding-16 w3-white">Sex:<input type="text"
-								name="sex" th:value="${session.sex}" style="width: 100%"></li>
-							<li class="w3-padding-16 w3-white">Expertise Level:<input
-								type="text" name="expertise_level" th:value="${session.expertiseLevel}"
-								style="width: 100%"></li>
+							<li class="w3-padding-16 w3-white">
+								<p>Please select your age:</p> 
+								<input type="radio" name="age" value="30" th:checked="${session.age} == '30'"> <label for="30">0-30</label><br>
+								<input type="radio" name="age" value="60" th:checked="${session.age} == '60'"> <label for="60">31-60</label><br> 
+								<input type="radio" name="age" value="100" th:checked="${session.age} == '100'"> <label for="100">61-100</label>
+							</li>
+
+							<li class="w3-padding-16 w3-white">
+								<p>Please select your gender:</p> 
+								<input type="radio" name="sex" value="M" th:checked="${session.sex} == 'M'"> <label for="M">Male</label><br>
+								<input type="radio" name="sex" value="F" th:checked="${session.sex} == 'F'"> <label for="F">Female</label><br> 
+								<input type="radio" name="sex" value="O" th:checked="${session.sex} == 'O'"> <label for="O">Other</label>
+							</li>
+
+							<li class="w3-padding-16 w3-white">
+								<p>Please select your expertise level:</p> 
+								<input type="radio" name="expertise_level" value="low" th:checked="${session.expertiseLevel} == 'low'"> <label for="low">Low</label><br>
+								<input type="radio" name="expertise_level" value="medium"  th:checked="${session.expertiseLevel} == 'medium'"> <label for="medium">Medium</label><br> 
+								<input type="radio" name="expertise_level" value="high"  th:checked="${session.expertiseLevel} == 'high'"> <label for="high">High</label>
+							</li>
+
 							</u1>
 							<br>
 

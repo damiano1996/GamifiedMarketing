@@ -83,8 +83,8 @@ public class LogInController extends HttpServlet {
 
 		if (user == null) {
 
-			ctx.setVariable("errorMsg", "Incorrect username or password");
-			path = "/WEB-INF/error.html";
+			ctx.setVariable("message", "Incorrect username or password");
+			path = "/WEB-INF/message.html";
 
 		} else {
 
