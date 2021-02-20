@@ -29,15 +29,24 @@ public class ReviewService {
 		// TODO Auto-generated constructor stub
 	}
 
-	public void addReview(Product product, User author, String content) {
-		Review review = new Review(product, author, content);
-		author.addReview(review);
+	public void addReview(Date productDate, int userId, String content) {
+		Product product = entityManager.find(Product.class, productDate);
+		User user = entityManager.find(User.class, userId);
+
+		Review review = new Review(product, user, content);
+		user.addReview(review);
 		product.addReview(review);
 
-		entityManager.persist(review);
+		// entityManager.persist(review);
+		entityManager.persist(user);
+		entityManager.persist(product);
+		entityManager.flush();
 	}
 
-	public boolean isReviewSubmitted(User user, Product product) {
+	public boolean isReviewSubmitted(Date productDate, int userId) {
+		Product product = entityManager.find(Product.class, productDate);
+		User user = entityManager.find(User.class, userId);
+
 		for (Review review : user.getReviews()) {
 			if (review.getProduct().getDate().equals(product.getDate()))
 				return true;

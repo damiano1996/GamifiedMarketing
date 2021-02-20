@@ -4,7 +4,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.ejb.EJB;
 import javax.servlet.RequestDispatcher;
@@ -24,12 +28,14 @@ import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
+import com.derin.damiano.entities.Answer;
 import com.derin.damiano.entities.Product;
-import com.derin.damiano.entities.Review;
+import com.derin.damiano.entities.Question;
 import com.derin.damiano.entities.User;
+import com.derin.damiano.exceptions.BlockedException;
+import com.derin.damiano.services.LeaderboardService;
 import com.derin.damiano.services.ProductService;
 import com.derin.damiano.services.QuestionnaireService;
-import com.derin.damiano.services.ReviewService;
 import com.derin.damiano.services.UserService;
 import com.derin.damiano.utils.ImageUtils;
 import com.derin.damiano.utils.ServletHandler;
@@ -37,9 +43,9 @@ import com.derin.damiano.utils.ServletHandler;
 /**
  * Servlet implementation class CreationController
  */
-@WebServlet("/review")
+@WebServlet("/leaderboard")
 @MultipartConfig
-public class ReviewController extends HttpServlet {
+public class LeaderboardController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private TemplateEngine templateEngine;
 
@@ -49,16 +55,16 @@ public class ReviewController extends HttpServlet {
 	@EJB(name = "com.derin.damiano.services/ProductService")
 	private ProductService productService;
 
-	@EJB(name = "com.derin.damiano.services/ReviewService")
-	private ReviewService reviewService;
-
 	@EJB(name = "com.derin.damiano.services/QuestionnaireService")
 	private QuestionnaireService questionnaireService;
+
+	@EJB(name = "com.derin.damiano.services/LeaderboardService")
+	private LeaderboardService leaderboardService;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
-	public ReviewController() {
+	public LeaderboardController() {
 		super();
 	}
 
@@ -71,50 +77,24 @@ public class ReviewController extends HttpServlet {
 		templateResolver.setSuffix(".html");
 	}
 
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
 		HttpSession session = request.getSession();
-		WebContext ctx = new WebContext(request, response, getServletContext(), request.getLocale());
-
-		String reviewContent = ServletHandler.getParameter(request, "review_content");
-		System.out.println("New review: " + reviewContent);
-
-		String path = null;
-		if (reviewContent != null) {
-
-			Product product = (Product) session.getAttribute("product");
-
-			try {
-				User user = (User) session.getAttribute("user");
-				reviewService.addReview(product.getDate(), user.getId(), reviewContent);
-
-				// updating product object
-				product = productService.getProductOfTheDay();
-				session.setAttribute("product", product);
-
-				boolean hide = reviewService.isReviewSubmitted(product.getDate(), user.getId());
-				System.out.println("isReviewSubmitted: " + hide);
-				session.setAttribute("hideReviewButton", hide);
-
-				path = "/WEB-INF/home.html";
-
-			} catch (Exception e) {
-				e.printStackTrace();
-//				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Only one comment per product!");
-				ctx.setVariable("message", "Only one comment per product!");
-				path = "/WEB-INF/message.html";
-//				return;
-			}
-
-		} else {
-
-			ctx.setVariable("message", "Something went wrong with your comment...");
-			path = "/WEB-INF/message.html";
+		ServletContext servletContext = getServletContext();
+		WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
+		
+		Product product = (Product) session.getAttribute("product");
+		
+		Map<Integer, User> leaderboard = leaderboardService.getLeaderboard(product.getDate());
+		
+		for (Integer i : leaderboard.keySet()) {
+			System.out.println("Points: " + i + " username: " + leaderboard.get(i));
 		}
+		
+		ctx.setVariable("leaderboard", leaderboard);
 
-		templateEngine.process(path, ctx, response.getWriter());
-
+		templateEngine.process("/WEB-INF/leaderboard.html", ctx, response.getWriter());
 	}
 
 	public void destroy() {

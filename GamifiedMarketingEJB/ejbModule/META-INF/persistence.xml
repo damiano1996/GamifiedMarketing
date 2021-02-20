@@ -13,5 +13,7 @@
 		<class>com.derin.damiano.entities.Statisticaldata</class>
 		<class>com.derin.damiano.entities.StatisticaldataPK</class>
 		<class>com.derin.damiano.entities.User</class>
+		<class>com.derin.damiano.entities.Badword</class>
+		<class>com.derin.damiano.entities.GamificationPoint</class>
 	</persistence-unit>
 </persistence>

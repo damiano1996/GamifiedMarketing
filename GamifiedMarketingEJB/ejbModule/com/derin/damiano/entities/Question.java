@@ -10,18 +10,19 @@ import java.util.List;
  */
 @Entity
 @Table(name = "question", schema = "db_gamified_marketing")
-@NamedQuery(name = "Question.findAll", query = "SELECT q FROM Question q")
+@NamedQuery(name = "Question.findAll", query = "SELECT q FROM Question q ORDER BY q.id ASC")
 public class Question implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 
 	@Lob
 	private String content;
 
 	// bi-directional many-to-one association to Answer
-	@OneToMany(mappedBy = "question")
+	@OneToMany(mappedBy = "question", cascade = CascadeType.PERSIST)
 	private List<Answer> answers;
 
 	// bi-directional many-to-one association to Product

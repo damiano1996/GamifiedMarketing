@@ -65,6 +65,7 @@ public class LogInController extends HttpServlet {
 
 		String username = ServletHandler.getParameter(request, "username");
 		String password = ServletHandler.getParameter(request, "password");
+		System.out.println(username + ":" + password);
 		if (username == null || password == null) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing credential value.");
 			return;
@@ -99,15 +100,18 @@ public class LogInController extends HttpServlet {
 				if (product != null) {
 
 					request.getSession().setAttribute("product", product);
+					// the button for the questionnaire will be hidden in the following two cases:
 					request.getSession().setAttribute("hideQuestionnaireButton",
-							questionnaireService.isQuestionnaireSubmitted(user, product));
+							questionnaireService.isQuestionnaireSubmitted(product.getDate(), user.getId())
+									|| user.isBlocked());
 					request.getSession().setAttribute("hideReviewButton",
-							reviewService.isReviewSubmitted(user, product));
+							reviewService.isReviewSubmitted(product.getDate(), user.getId()));
 
 					path = "/WEB-INF/home.html";
 
 				} else {
-					path = "/WEB-INF/no_product_today.html";
+					ctx.setVariable("message", "No product to review today...");
+					path = "/WEB-INF/message.html";
 				}
 
 			}

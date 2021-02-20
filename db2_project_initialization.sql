@@ -14,11 +14,13 @@ create table `UserTable` (
     `surname` varchar(45) not null,
     `admin` bool default false,
     `blocked` bool default false,
-    `gamification_points` int default 0,
     primary key (`id`)
 );
 
-insert into `UserTable` (`username`, `email`, `password`, `name`, `surname`, `admin`) values ('admin', 'admin@admin.admin', 'admin', 'admin', 'admin', true);
+insert into `UserTable` (`username`, `email`, `password`, `name`, `surname`, `admin`) values ('admin', 'admin@gamifiedmarketing.com', 'admin', 'admin', 'admin', true);
+insert into `UserTable` (`username`, `email`, `password`, `name`, `surname`) values ('aa', 'aa@gamifiedmarketing.com', 'aa', 'aa', 'aa');
+insert into `UserTable` (`username`, `email`, `password`, `name`, `surname`) values ('bb', 'bb@gamifiedmarketing.com', 'bb', 'bb', 'bb');
+insert into `UserTable` (`username`, `email`, `password`, `name`, `surname`) values ('cc', 'cc@gamifiedmarketing.com', 'cc', 'cc', 'cc');
 
 drop table if exists `LogInHistory`;
 create table `LogInHistory` (
@@ -57,8 +59,8 @@ create table `StatisticalData` (
     `product_date` date not null,
     `user_id` int not null,
     `age` int,
-    `sex` varchar(4),
-    `expertise_level` varchar(45),
+    `sex` enum('M', 'F', 'O'),
+    `expertise_level` enum('low', 'medium', 'high'),
     primary key (`product_date` , `user_id`),
     foreign key (`product_date`)
         references `Product` (`date`)
@@ -92,3 +94,38 @@ create table `Answer` (
         references `UserTable` (`id`)
         on delete cascade on update cascade
 );
+
+drop table if exists `GamificationPoint`;
+create table `GamificationPoint` (
+	`id` int not null auto_increment,
+	`user_id` int not null,
+    `product_date` date not null,
+    `points` int not null,
+    primary key (`id`),
+    foreign key (`user_id`)
+		references `UserTable` (`id`)
+        on delete cascade on update cascade,
+	foreign key (`product_date`)
+		references `Product` (`date`)
+        on delete cascade on update cascade
+);
+
+drop table if exists `Badword`;
+create table `Badword` (
+	`word` varchar(255) not null,
+    primary key (`word`)
+);
+
+# ------------------------------------------------
+# ------------------- TRIGGERS -------------------
+# ------------------------------------------------
+
+create trigger marketing_questionnaire_gamification_points
+	after insert on `Answer`
+    for each row
+	insert into `GamificationPoint` (`user_id`, `product_date`, `points`) values (new.id_creator, (select q.product_date from `Question` as q where q.id = new.question_id), 1);
+
+create trigger statistical_questionnaire_sex_gamification_points
+	after insert on `StatisticalData`
+    for each row
+    insert into `GamificationPoint` (`user_id`, `product_date`, `points`) values (new.user_id, new.product_date, if(new.age != -1, 2, 0) + if(new.sex is not null, 2, 0) + if(new.expertise_level is not null, 2, 0));

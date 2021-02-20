@@ -30,6 +30,8 @@ import com.derin.damiano.entities.Answer;
 import com.derin.damiano.entities.Product;
 import com.derin.damiano.entities.Question;
 import com.derin.damiano.entities.User;
+import com.derin.damiano.exceptions.BlockedException;
+import com.derin.damiano.exceptions.EmptyQuestionnaireException;
 import com.derin.damiano.services.ProductService;
 import com.derin.damiano.services.QuestionnaireService;
 import com.derin.damiano.services.UserService;
@@ -82,11 +84,7 @@ public class QuestionnaireController extends HttpServlet {
 
 		List answers = (ArrayList<Answer>) session.getAttribute("answers");
 		if (answers == null) {
-			answers = new ArrayList<Answer>();
-			for (Question question : product.getQuestions()) {
-				Answer answer = new Answer("", question, user);
-				answers.add(answer);
-			}
+			answers = questionnaireService.getEmptyAnswers(product.getDate(), user.getId());
 			session.setAttribute("answers", answers);
 		}
 
@@ -98,6 +96,7 @@ public class QuestionnaireController extends HttpServlet {
 
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("user");
+		Product product = (Product) session.getAttribute("product");
 
 		WebContext ctx = new WebContext(request, response, getServletContext(), request.getLocale());
 
@@ -105,39 +104,19 @@ public class QuestionnaireController extends HttpServlet {
 
 		if (request.getParameter("submit").equals("Next")) {
 
-			for (Answer answer : (ArrayList<Answer>) session.getAttribute("answers")) {
-				String content = StringEscapeUtils
-						.escapeJava(request.getParameter("" + answer.getId().getQuestionId()));
-				answer.setContent(content);
-			}
-
-			templateEngine.process("/WEB-INF/statistical_questionnaire.html", ctx, response.getWriter());
+			doNext(request, response, session, ctx);
 
 		} else if (request.getParameter("submit").equals("Submit")) {
 
-			int age = Integer.parseInt(ServletHandler.getParameter(request, "age"));
-			String sex = StringEscapeUtils.escapeJava(ServletHandler.getParameter(request, "sex"));
-			String expertiseLevel = StringEscapeUtils
-					.escapeJava(ServletHandler.getParameter(request, "expertise_level"));
-
-			questionnaireService.addQuestionnaire(user, (ArrayList<Answer>) session.getAttribute("answers"), age, sex,
-					expertiseLevel);
-
-			session.setAttribute("hideQuestionnaireButton",
-					questionnaireService.isQuestionnaireSubmitted(user, (Product) session.getAttribute("product")));
-
-			templateEngine.process("/WEB-INF/thanks.html", ctx, response.getWriter());
+			doSubmit(request, response, session, ctx);
 
 		} else if (request.getParameter("submit").equals("Previous")) {
 
-			session.setAttribute("age", ServletHandler.getParameter(request, "age"));
-			session.setAttribute("sex", ServletHandler.getParameter(request, "sex"));
-			session.setAttribute("expertiseLevel", ServletHandler.getParameter(request, "expertise_level"));
-
-			templateEngine.process("/WEB-INF/marketing_questionnaire.html", ctx, response.getWriter());
+			doPrevious(request, response, session, ctx);
 
 		} else if (request.getParameter("submit").equals("Cancel")) {
-			templateEngine.process("/WEB-INF/home.html", ctx, response.getWriter());
+
+			doCancel(request, response, session, ctx);
 
 		}
 
@@ -146,6 +125,73 @@ public class QuestionnaireController extends HttpServlet {
 //			templateEngine.process("/WEB-INF/message.html", ctx, response.getWriter());
 //
 //		}
+
+	}
+
+	private void doNext(HttpServletRequest request, HttpServletResponse response, HttpSession session, WebContext ctx)
+			throws IOException {
+
+		for (Answer answer : (ArrayList<Answer>) session.getAttribute("answers")) {
+			System.out.println("Ans question id: " + answer.getId().getQuestionId());
+			String content = ServletHandler.getParameter(request, "" + answer.getId().getQuestionId());
+			System.out.println("Ans content: " + content);
+			answer.setContent(content);
+		}
+
+		templateEngine.process("/WEB-INF/statistical_questionnaire.html", ctx, response.getWriter());
+	}
+
+	private void doSubmit(HttpServletRequest request, HttpServletResponse response, HttpSession session, WebContext ctx)
+			throws IOException {
+		User user = (User) session.getAttribute("user");
+		Product product = (Product) session.getAttribute("product");
+
+		String ageString = ServletHandler.getParameter(request, "age");
+		int age = -1;
+		if (ageString != null) {
+			age = Integer.parseInt(ageString);
+		}
+		String sex = ServletHandler.getParameter(request, "sex");
+		String expertiseLevel = ServletHandler.getParameter(request, "expertise_level");
+
+		try {
+			questionnaireService.addQuestionnaire(product.getDate(), user.getId(),
+					(ArrayList<Answer>) session.getAttribute("answers"), age, sex, expertiseLevel);
+
+			session.setAttribute("hideQuestionnaireButton",
+					questionnaireService.isQuestionnaireSubmitted(product.getDate(), user.getId()));
+
+			templateEngine.process("/WEB-INF/thanks.html", ctx, response.getWriter());
+
+		} catch (BlockedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			session.setAttribute("hideQuestionnaireButton", user.isBlocked());
+			ctx.setVariable("message", "Bad words are NOT admitted. You won't be able to submit new questionnaires!");
+			templateEngine.process("/WEB-INF/message.html", ctx, response.getWriter());
+
+		} catch (EmptyQuestionnaireException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			ctx.setVariable("message", "Marketing questions must be filled!");
+			templateEngine.process("/WEB-INF/message.html", ctx, response.getWriter());
+		}
+	}
+
+	private void doPrevious(HttpServletRequest request, HttpServletResponse response, HttpSession session,
+			WebContext ctx) throws IOException {
+
+		session.setAttribute("age", ServletHandler.getParameter(request, "age"));
+		session.setAttribute("sex", ServletHandler.getParameter(request, "sex"));
+		session.setAttribute("expertiseLevel", ServletHandler.getParameter(request, "expertise_level"));
+
+		templateEngine.process("/WEB-INF/marketing_questionnaire.html", ctx, response.getWriter());
+	}
+
+	private void doCancel(HttpServletRequest request, HttpServletResponse response, HttpSession session, WebContext ctx)
+			throws IOException {
+
+		templateEngine.process("/WEB-INF/home.html", ctx, response.getWriter());
 
 	}
 

@@ -27,15 +27,15 @@ public class Product implements Serializable {
 	private String name;
 
 	// bi-directional many-to-one association to Review
-	@OneToMany(mappedBy = "product")
+	@OneToMany(mappedBy = "product", cascade = CascadeType.PERSIST)
 	private List<Review> reviews;
 
 	// bi-directional many-to-one association to Question
-	@OneToMany(mappedBy = "product")
+	@OneToMany(mappedBy = "product", cascade = CascadeType.PERSIST)
 	private List<Question> questions;
 
 	// bi-directional many-to-one association to Statisticaldata
-	@OneToMany(mappedBy = "product")
+	@OneToMany(mappedBy = "product", cascade = CascadeType.PERSIST)
 	private List<Statisticaldata> statisticaldata;
 
 	public Product() {

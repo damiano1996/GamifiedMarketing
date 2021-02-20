@@ -29,27 +29,44 @@ public class ProductService {
 		// TODO Auto-generated constructor stub
 	}
 
-	public void addProduct(Date date, byte[] image, String name, String[] questions) {
-		Product product = new Product(date, image, name);
-		entityManager.persist(product);
-
-		for (String question : questions) {
-			Question questionObj = new Question(product, question);
-			product.addQuestion(questionObj);
-
-			entityManager.persist(questionObj);
-		}
+	public void createNewProduct(Date date, byte[] image, String name, String[] questions) {
+		addProduct(date, image, name);
+		addQuestions(date, questions);
 	}
 
-	public Product getProductOfTheDay() {
+	public void addProduct(Date date, byte[] image, String name) {
+		Product product = new Product(date, image, name);
+		entityManager.persist(product);
+		entityManager.flush();
+	}
+
+	public void addQuestions(Date date, String[] questions) {
+		Product product = getProductByDate(date);
+
+		for (String questionString : questions) {
+			Question question = new Question(product, questionString);
+			product.addQuestion(question);
+			entityManager.persist(question);
+
+		}
+
+		entityManager.persist(product);
+		entityManager.flush();
+	}
+
+	public Product getProductByDate(Date date) {
 		Product product = null;
 		try {
-			product = entityManager.createNamedQuery("Product.productByDate", Product.class).setParameter(1, new Date())
+			product = entityManager.createNamedQuery("Product.productByDate", Product.class).setParameter(1, date)
 					.getSingleResult();
 
 		} catch (PersistenceException e) {
 		}
 		return product;
+	}
+
+	public Product getProductOfTheDay() {
+		return getProductByDate(new Date());
 	}
 
 }

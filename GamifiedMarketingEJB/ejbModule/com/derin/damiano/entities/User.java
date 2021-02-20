@@ -11,7 +11,7 @@ import java.util.List;
 @Entity
 @Table(name = "usertable", schema = "db_gamified_marketing")
 @NamedQuery(name = "User.findAll", query = "SELECT u FROM User u")
-@NamedQuery(name = "User.checkCredentials", query = "SELECT u FROM User u WHERE u.username = ?1 and u.password = ?2")
+@NamedQuery(name = "User.checkCredentials", query = "SELECT u FROM User u WHERE u.username = ?1 AND u.password = ?2")
 public class User implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -24,9 +24,6 @@ public class User implements Serializable {
 
 	private String email;
 
-	@Column(name = "gamification_points")
-	private int gamificationPoints;
-
 	private String name;
 
 	private String password;
@@ -36,20 +33,24 @@ public class User implements Serializable {
 	private String username;
 
 	// bi-directional many-to-one association to Review
-	@OneToMany(mappedBy = "user")
+	@OneToMany(mappedBy = "user", cascade = CascadeType.PERSIST)
 	private List<Review> reviews;
 
 	// bi-directional many-to-one association to Answer
-	@OneToMany(mappedBy = "user")
+	@OneToMany(mappedBy = "user", cascade = CascadeType.PERSIST)
 	private List<Answer> answers;
 
 	// bi-directional many-to-one association to LoginHistory
-	@OneToMany(mappedBy = "user")
+	@OneToMany(mappedBy = "user", cascade = CascadeType.PERSIST)
 	private List<LoginHistory> loginHistories;
 
 	// bi-directional many-to-one association to Statisticaldata
-	@OneToMany(mappedBy = "user")
+	@OneToMany(mappedBy = "user", cascade = CascadeType.PERSIST)
 	private List<Statisticaldata> statisticaldata;
+
+	// bi-directional many-to-one association to GamificationPoint
+	@OneToMany(mappedBy = "user", cascade = CascadeType.PERSIST)
+	private List<GamificationPoint> gamificationPoints;
 
 	public User() {
 	}
@@ -92,14 +93,6 @@ public class User implements Serializable {
 
 	public void setEmail(String email) {
 		this.email = email;
-	}
-
-	public int getGamificationPoints() {
-		return this.gamificationPoints;
-	}
-
-	public void setGamificationPoints(int gamificationPoints) {
-		this.gamificationPoints = gamificationPoints;
 	}
 
 	public String getName() {
@@ -220,6 +213,28 @@ public class User implements Serializable {
 		statisticaldata.setUser(null);
 
 		return statisticaldata;
+	}
+
+	public List<GamificationPoint> getGamificationPoints() {
+		return this.gamificationPoints;
+	}
+
+	public void setGamificationPoint(List<GamificationPoint> gamificationPoints) {
+		this.gamificationPoints = gamificationPoints;
+	}
+
+	public GamificationPoint addGamificationPoint(GamificationPoint gamificationPoint) {
+		getGamificationPoints().add(gamificationPoint);
+		gamificationPoint.setUser(this);
+
+		return gamificationPoint;
+	}
+
+	public GamificationPoint removeGamificationPoint(GamificationPoint gamificationPoint) {
+		getGamificationPoints().remove(gamificationPoint);
+		gamificationPoint.setUser(null);
+
+		return gamificationPoint;
 	}
 
 }

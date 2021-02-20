@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <title>Gamified Marketing</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -14,16 +14,6 @@ body, h1, h2, h3, h4, h5 {
 input {
 	text-align: center;
 }
-
-td {
-	text-align: center;
-	vertical-align: middle;
-}
-
-tr {
-	text-align: center;
-	vertical-align: middle;
-}
 </style>
 <body class="w3-light-grey">
 
@@ -37,32 +27,33 @@ and is wrapped around the whole page content, except for the footer in this exam
 			<h1>
 				<b>GAMIFIED MARKETING</b>
 			</h1>
-		</header>
+			<h4>Inspection</h4>
 
+		</header>
 
 		<div class="w3-row">
 
-			<div class="w3-col s4 w3-center">
-				<p></p>
-			</div>
+			<div class="w3-col l8 s4">
 
-
-			<div class="w3-col s4 w3-center">
-				<div class="w3-container w3-center">
-					<h1>
-						<b><p th:text="${message}"></p></b>
-					</h1>
+				<div class="w3-row">
+					<div class="w3-col s6 w3-center">
+						<h5>Past Questionnaires</h5>
+					</div>
 				</div>
 
-				<div class="w3-container w3-center">
-					<div class="w3-container w3-padding-32 w3-center">
-						<form action="logout" method="GET">
-							<input class="w3-button w3-grey" type="submit" name="Exit"
-								value="Exit">
-						</form>
+				<u1 class="w3-ul w3-hoverable w3-white"
+					th:each="date : ${availableDates}">
+
+				<div class="w3-row w3-padding-8 w3-white">
+					<div class="w3-col s6 w3-center">
+						<p th:text="${date}">
 					</div>
 				</div>
 			</div>
+
+			<div class="w3-col l8 s4"></div>
+
+			<div class="w3-col l8 s4"></div>
 
 		</div>
 
