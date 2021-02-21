@@ -38,6 +38,14 @@ public class Product implements Serializable {
 	@OneToMany(mappedBy = "product", cascade = CascadeType.PERSIST)
 	private List<Statisticaldata> statisticaldata;
 
+	// bi-directional many-to-one association to GamificationPoint
+	@OneToMany(mappedBy = "product", cascade = CascadeType.PERSIST)
+	private List<GamificationPoint> gamificationPoints;
+
+	// bi-directional many-to-one association to CancelledQuestionnaire
+	@OneToMany(mappedBy = "product", cascade = CascadeType.PERSIST)
+	private List<CancelledQuestionnaire> cancelledQuestionnaires;
+
 	public Product() {
 	}
 
@@ -105,6 +113,14 @@ public class Product implements Serializable {
 		this.questions = questions;
 	}
 
+	public List<CancelledQuestionnaire> getCancelledQuestionnaires() {
+		return this.cancelledQuestionnaires;
+	}
+
+	public void setCancelledQuestionnaires(List<CancelledQuestionnaire> cancelledQuestionnaires) {
+		this.cancelledQuestionnaires = cancelledQuestionnaires;
+	}
+
 	public Question addQuestion(Question question) {
 		getQuestions().add(question);
 		question.setProduct(this);
@@ -139,6 +155,13 @@ public class Product implements Serializable {
 		statisticaldata.setProduct(null);
 
 		return statisticaldata;
+	}
+
+	public CancelledQuestionnaire addCancelledQuestionnaire(CancelledQuestionnaire cancelledQuestionnaire) {
+		getCancelledQuestionnaires().add(cancelledQuestionnaire);
+		cancelledQuestionnaire.setProduct(this);
+
+		return cancelledQuestionnaire;
 	}
 
 }

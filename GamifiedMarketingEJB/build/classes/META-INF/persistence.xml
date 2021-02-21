@@ -15,5 +15,6 @@
 		<class>com.derin.damiano.entities.User</class>
 		<class>com.derin.damiano.entities.Badword</class>
 		<class>com.derin.damiano.entities.GamificationPoint</class>
+		<class>com.derin.damiano.entities.CancelledQuestionnaire</class>
 	</persistence-unit>
 </persistence>

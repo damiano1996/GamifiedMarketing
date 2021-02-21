@@ -95,6 +95,20 @@ create table `Answer` (
         on delete cascade on update cascade
 );
 
+drop table if exists `CancelledQuestionnaire`;
+create table `CancelledQuestionnaire` (
+	`id` int not null auto_increment,
+	`user_id` int not null,
+    `product_date` date not null,
+    primary key (`id`),
+	foreign key (`user_id`)
+		references `UserTable` (`id`)
+        on delete cascade on update cascade,
+	foreign key (`product_date`)
+		references `Product` (`date`)
+        on delete cascade on update cascade
+);
+
 drop table if exists `GamificationPoint`;
 create table `GamificationPoint` (
 	`id` int not null auto_increment,

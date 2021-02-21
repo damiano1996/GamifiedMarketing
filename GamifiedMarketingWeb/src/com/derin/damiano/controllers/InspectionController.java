@@ -120,8 +120,13 @@ public class InspectionController extends HttpServlet {
 
 				Date date = availableDatesByString.get(requestedDate);
 				ArrayList<User> usersWhoSubmitted = questionnaireService.getUsersWhoSubmitted(date);
-
 				session.setAttribute("usersWhoSubmitted", usersWhoSubmitted);
+
+				ArrayList<User> usersWhoCancelled = questionnaireService.getUserWhoCancelledQuestionnaire(date);
+				session.setAttribute("usersWhoCancelled", usersWhoCancelled);
+				for (User u : usersWhoCancelled) {
+					System.out.println("user who cancelled: " + u.getUsername());
+				}
 
 				// resetting other attributes
 				session.setAttribute("marketingAnswers", null);

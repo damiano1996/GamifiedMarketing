@@ -10,8 +10,11 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 
+import org.apache.commons.lang3.time.DateUtils;
+
 import com.derin.damiano.entities.Answer;
 import com.derin.damiano.entities.Badword;
+import com.derin.damiano.entities.CancelledQuestionnaire;
 import com.derin.damiano.entities.LoginHistory;
 import com.derin.damiano.entities.Product;
 import com.derin.damiano.entities.Question;
@@ -128,36 +131,75 @@ public class QuestionnaireService {
 		return answers;
 	}
 
-	public boolean isQuestionnaireSubmitted(Date productDate, int userId) {
+	public void cancelQuestionnaire(Date productDate, int userId) {
 		Product product = entityManager.find(Product.class, productDate);
 		User user = entityManager.find(User.class, userId);
 
-		for (Answer answer : user.getAnswers()) {
-			if (answer.getQuestion().getProduct().getDate().equals(product.getDate()))
+		CancelledQuestionnaire cancelledQuestionnaire = new CancelledQuestionnaire(product, user);
+		user.addCancelledQuestionnaire(cancelledQuestionnaire);
+		product.addCancelledQuestionnaire(cancelledQuestionnaire);
+
+		entityManager.persist(user);
+		entityManager.persist(product);
+	}
+
+	public boolean isQuestionnaireSubmitted(Date productDate, int userId) {
+		Product product = entityManager.find(Product.class, productDate);
+//		User user = entityManager.find(User.class, userId);
+
+		// Since we have only one statisticaldata for each questionnaire we can check
+		// if there is one stored. If so, the questionnaire has been submitted.
+		List<Statisticaldata> statisticaldatas = product.getStatisticaldata();
+
+		for (Statisticaldata statisticaldata : statisticaldatas) {
+			if (statisticaldata.getUser().getId() == userId)
 				return true;
 		}
 		return false;
+
+//		for (Answer answer : user.getAnswers()) {
+//			if (answer.getQuestion().getProduct().getDate().equals(product.getDate()))
+//				return true;
+//		}
+//		return false;
 	}
 
 	public ArrayList<User> getUsersWhoSubmitted(Date productDate) {
-		List<User> users = null;
-		try {
-			users = entityManager.createNamedQuery("User.findAll", User.class).getResultList();
-		} catch (PersistenceException e) {
-		}
+		Product product = entityManager.find(Product.class, productDate);
 
+		List<Statisticaldata> statisticaldatas = product.getStatisticaldata();
 		ArrayList<User> whoSubmitted = new ArrayList<>();
-		for (User user : users) {
-			if (isQuestionnaireSubmitted(productDate, user.getId())) {
-				whoSubmitted.add(user);
-			}
+
+		for (Statisticaldata statisticaldata : statisticaldatas) {
+			whoSubmitted.add(statisticaldata.getUser());
 		}
 		return whoSubmitted;
+
+//		List<User> users = null;
+//		try {
+//			users = entityManager.createNamedQuery("User.findAll", User.class).getResultList();
+//		} catch (PersistenceException e) {
+//		}
+//
+//		ArrayList<User> whoSubmitted = new ArrayList<>();
+//		for (User user : users) {
+//			if (isQuestionnaireSubmitted(productDate, user.getId())) {
+//				whoSubmitted.add(user);
+//			}
+//		}
+//		return whoSubmitted;
 	}
 
 	public ArrayList<User> getUserWhoCancelledQuestionnaire(Date productDate) {
-		ArrayList<User> whoCancelled = new ArrayList<>();
-		return whoCancelled;
+		Product product = entityManager.find(Product.class, productDate);
+
+		List<CancelledQuestionnaire> cancelledQuestionnaires = product.getCancelledQuestionnaires();
+		ArrayList<User> usersWhoCancelled = new ArrayList<>();
+		for (CancelledQuestionnaire cancelledQuestionnaire : cancelledQuestionnaires) {
+			usersWhoCancelled.add(cancelledQuestionnaire.getUser());
+		}
+		return usersWhoCancelled;
+
 	}
 
 	public ArrayList<Answer> getMarketingAnswers(Date productDate, int userId) {
@@ -196,7 +238,8 @@ public class QuestionnaireService {
 
 		ArrayList<Date> dates = new ArrayList<>();
 		for (Product product : products) {
-			dates.add(product.getDate());
+			// if (!DateUtils.isSameDay(product.getDate(), new Date()) && product.getDate().before(new Date()))
+				dates.add(product.getDate());
 		}
 		return dates;
 	}

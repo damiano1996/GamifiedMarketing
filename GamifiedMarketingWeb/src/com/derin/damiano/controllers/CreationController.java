@@ -124,13 +124,15 @@ public class CreationController extends HttpServlet {
 					}
 
 					productService.createNewProduct(date, imgByteArray, productName, questions);
+
+					path = "/WEB-INF/adminhome.html";
+
 				} catch (Exception e) {
 					ctx.setVariable("message",
 							"Something went wrong with your request. Probably you selected an existing date for the product.");
 					path = "/WEB-INF/message.html";
 				}
 
-				path = "/WEB-INF/adminhome.html";
 			} else {
 				ctx.setVariable("message", "Something went wrong...");
 				path = "/WEB-INF/message.html";

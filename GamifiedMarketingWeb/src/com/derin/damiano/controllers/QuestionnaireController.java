@@ -101,9 +101,9 @@ public class QuestionnaireController extends HttpServlet {
 		WebContext ctx = new WebContext(request, response, getServletContext(), request.getLocale());
 
 //		try {
-		
+
 		String operation = request.getParameter("submit");
-		
+
 		if (operation.equals("Next")) {
 
 			doNext(request, response, session, ctx);
@@ -192,6 +192,11 @@ public class QuestionnaireController extends HttpServlet {
 
 	private void doCancel(HttpServletRequest request, HttpServletResponse response, HttpSession session, WebContext ctx)
 			throws IOException {
+
+		User user = (User) session.getAttribute("user");
+		Product product = (Product) session.getAttribute("product");
+
+		questionnaireService.cancelQuestionnaire(product.getDate(), user.getId());
 
 		templateEngine.process("/WEB-INF/home.html", ctx, response.getWriter());
 

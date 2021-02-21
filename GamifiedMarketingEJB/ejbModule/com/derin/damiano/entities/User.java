@@ -52,6 +52,10 @@ public class User implements Serializable {
 	@OneToMany(mappedBy = "user", cascade = CascadeType.PERSIST)
 	private List<GamificationPoint> gamificationPoints;
 
+	// bi-directional many-to-one association to CancelledQuestionnaire
+	@OneToMany(mappedBy = "user", cascade = CascadeType.PERSIST)
+	private List<CancelledQuestionnaire> cancelledQuestionnaires;
+
 	public User() {
 	}
 
@@ -235,6 +239,21 @@ public class User implements Serializable {
 		gamificationPoint.setUser(null);
 
 		return gamificationPoint;
+	}
+
+	public List<CancelledQuestionnaire> getCancelledQuestionnaires() {
+		return this.cancelledQuestionnaires;
+	}
+
+	public void setCancelledQuestionnaires(List<CancelledQuestionnaire> cancelledQuestionnaires) {
+		this.cancelledQuestionnaires = cancelledQuestionnaires;
+	}
+
+	public CancelledQuestionnaire addCancelledQuestionnaire(CancelledQuestionnaire cancelledQuestionnaire) {
+		getCancelledQuestionnaires().add(cancelledQuestionnaire);
+		cancelledQuestionnaire.setUser(this);
+
+		return cancelledQuestionnaire;
 	}
 
 }
