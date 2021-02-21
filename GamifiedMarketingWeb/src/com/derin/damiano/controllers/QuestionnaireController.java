@@ -101,20 +101,22 @@ public class QuestionnaireController extends HttpServlet {
 		WebContext ctx = new WebContext(request, response, getServletContext(), request.getLocale());
 
 //		try {
-
-		if (request.getParameter("submit").equals("Next")) {
+		
+		String operation = request.getParameter("submit");
+		
+		if (operation.equals("Next")) {
 
 			doNext(request, response, session, ctx);
 
-		} else if (request.getParameter("submit").equals("Submit")) {
+		} else if (operation.equals("Submit")) {
 
 			doSubmit(request, response, session, ctx);
 
-		} else if (request.getParameter("submit").equals("Previous")) {
+		} else if (operation.equals("Previous")) {
 
 			doPrevious(request, response, session, ctx);
 
-		} else if (request.getParameter("submit").equals("Cancel")) {
+		} else if (operation.equals("Cancel")) {
 
 			doCancel(request, response, session, ctx);
 

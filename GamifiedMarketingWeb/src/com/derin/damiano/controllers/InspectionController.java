@@ -6,6 +6,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.ejb.EJB;
 import javax.servlet.RequestDispatcher;
@@ -25,6 +27,8 @@ import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
+import com.derin.damiano.entities.Answer;
+import com.derin.damiano.entities.Statisticaldata;
 import com.derin.damiano.entities.User;
 import com.derin.damiano.services.ProductService;
 import com.derin.damiano.services.QuestionnaireService;
@@ -78,8 +82,7 @@ public class InspectionController extends HttpServlet {
 
 		if (user.isAdmin()) {
 
-			ArrayList<Date> availableDates = questionnaireService.getAvailableQuestionnaires();
-			ctx.setVariable("availableDates", availableDates);
+			session.setAttribute("availableDatesByString", getAvailableDatesByString());
 			path = "/WEB-INF/inspection.html";
 
 		} else {
@@ -102,7 +105,51 @@ public class InspectionController extends HttpServlet {
 
 		String path;
 		if (user.isAdmin()) {
-			
+
+			String operation = request.getParameter("submit");
+			System.out.println("operation: " + operation);
+
+			if (operation.contains("Questionnaire")) {
+
+				String requestedDate = operation.replace("Questionnaire: ", "");
+				session.setAttribute("requestedDate", requestedDate);
+				System.out.println("Requested date: " + requestedDate);
+
+				HashMap<String, Date> availableDatesByString = (HashMap<String, Date>) session
+						.getAttribute("availableDatesByString");
+
+				Date date = availableDatesByString.get(requestedDate);
+				ArrayList<User> usersWhoSubmitted = questionnaireService.getUsersWhoSubmitted(date);
+
+				session.setAttribute("usersWhoSubmitted", usersWhoSubmitted);
+
+				// resetting other attributes
+				session.setAttribute("marketingAnswers", null);
+				session.setAttribute("statisticaldata", null);
+
+			} else if (operation.contains("User")) {
+
+				String[] parts = operation.split(" ");
+				String userIdString = parts[1];
+				int userId = Integer.parseInt(userIdString);
+				System.out.println("Requested userId: " + userId);
+
+				Date date = null;
+				try {
+					date = new SimpleDateFormat(CreationController.DATE_FORMAT)
+							.parse((String) session.getAttribute("requestedDate"));
+				} catch (ParseException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+
+				ArrayList<Answer> marketingAnswers = questionnaireService.getMarketingAnswers(date, userId);
+				session.setAttribute("marketingAnswers", marketingAnswers);
+
+				Statisticaldata statisticaldata = questionnaireService.getStatisticalAnswers(date, userId);
+				session.setAttribute("statisticaldata", statisticaldata);
+			}
+
 			path = "/WEB-INF/inspection.html";
 
 		} else {
@@ -113,6 +160,18 @@ public class InspectionController extends HttpServlet {
 
 		templateEngine.process(path, ctx, response.getWriter());
 
+	}
+
+	private HashMap<String, Date> getAvailableDatesByString() {
+		ArrayList<Date> availableDates = questionnaireService.getAvailableQuestionnaires();
+		HashMap<String, Date> availableDatesByString = new HashMap<>();
+
+		for (Date date : availableDates) {
+			String dateString = new SimpleDateFormat(CreationController.DATE_FORMAT).format(date);
+			availableDatesByString.put(dateString, date);
+			System.out.println(date + " : " + dateString);
+		}
+		return availableDatesByString;
 	}
 
 	public void destroy() {

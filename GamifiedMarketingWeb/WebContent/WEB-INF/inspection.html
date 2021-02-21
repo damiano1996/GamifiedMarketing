@@ -33,28 +33,119 @@ and is wrapped around the whole page content, except for the footer in this exam
 
 		<div class="w3-row">
 
-			<div class="w3-col l8 s4">
+			<div class="w3-col s4">
 
-				<div class="w3-row">
-					<div class="w3-col s6 w3-center">
-						<h5>Past Questionnaires</h5>
-					</div>
-				</div>
+				<div class="w3-card-4 w3-margin">
+					<div class="w3-container">
 
-				<u1 class="w3-ul w3-hoverable w3-white"
-					th:each="date : ${availableDates}">
+						<div class="w3-row">
+							<div class="w3-col w3-center">
+								<h5>Available Questionnaires by Date</h5>
+							</div>
+						</div>
 
-				<div class="w3-row w3-padding-8 w3-white">
-					<div class="w3-col s6 w3-center">
-						<p th:text="${date}">
+						<u1 class="w3-ul w3-hoverable w3-white"
+							th:each="dateString : ${session.availableDatesByString.keySet()}">
+
+						<div class="w3-container w3-padding-32 w3-center">
+							<form action="inspection" method="POST">
+								<input class="w3-button w3-white" type="submit" name="submit"
+									style="width: 100%"
+									th:value="${'Questionnaire: ' + dateString}">
+							</form>
+						</div>
 					</div>
 				</div>
 			</div>
 
-			<div class="w3-col l8 s4"></div>
+			<div class="w3-col s4">
 
-			<div class="w3-col l8 s4"></div>
+				<div class="w3-card-4 w3-margin"
+					th:if="${session.usersWhoSubmitted != null}">
+					<div class="w3-container">
 
+						<div class="w3-row">
+							<div class="w3-col w3-center">
+								<h5>Users Who Submitted</h5>
+							</div>
+						</div>
+
+						<u1 class="w3-ul w3-hoverable w3-white"
+							th:each="user : ${session.usersWhoSubmitted}">
+
+						<div class="w3-container w3-padding-32 w3-center">
+							<form action="inspection" method="POST">
+								<input class="w3-button w3-white" type="submit" name="submit"
+									style="width: 100%"
+									th:value="${'User: ' + user.getId() + ' - ' + user.getUsername()}">
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="w3-col s4">
+
+				<div class="w3-card-4 w3-margin"
+					th:if="${session.marketingAnswers != null}">
+					<div class="w3-container">
+
+						<div class="w3-row">
+							<div class="w3-col w3-center">
+								<h5>User's Answers</h5>
+							</div>
+						</div>
+
+						<div class="w3-container w3-padding-32">
+
+
+							<div class="w3-row" th:if="${session.statisticaldata != null}">
+								<div class="w3-col w3-center s4 w3-padding-4"
+									th:if="${session.statisticaldata.getAge() != -1}">
+									<p th:text="${'age: 0-30'}"
+										th:if="${session.statisticaldata.getAge() == 30}"></p>
+									<p th:text="${'age: 31-60'}"
+										th:if="${session.statisticaldata.getAge() == 60}"></p>
+									<p th:text="${'age: 61-100'}"
+										th:if="${session.statisticaldata.getAge() == 100}"></p>
+								</div>
+								<div class="w3-col w3-center s4 w3-padding-4"
+									th:if="${session.statisticaldata.getSex() != null}">
+									<p th:text="${'sex: ' + session.statisticaldata.getSex()}"></p>
+								</div>
+								<div class="w3-col w3-center s4 w3-padding-4"
+									th:if="${session.statisticaldata.getExpertiseLevel() != null}">
+									<p
+										th:text="${'expertise_level: ' + session.statisticaldata.getExpertiseLevel()}"></p>
+								</div>
+							</div>
+
+							<u1 class="w3-ul w3-hoverablew3-padding-8"
+								th:each="answer : ${session.marketingAnswers}">
+							<li class="w3-padding-4"><p
+									th:text="${'Q: ' + answer.getQuestion().getContent()}"></p></li>
+							<li class="w3-padding-4 w3-white"><p
+									th:text="${'A: ' + answer.getContent()}"></p></li>
+							</u1>
+
+						</div>
+
+					</div>
+				</div>
+			</div>
+
+
+		</div>
+
+		<div class="w3-row">
+			<div class="w3-container w3-right">
+				<div class="w3-container w3-padding-32 w3-center">
+					<form action="backtoadminhome" method="GET">
+						<input class="w3-button w3-grey" type="submit" name="Home"
+							value="Home">
+					</form>
+				</div>
+			</div>
 		</div>
 
 	</div>
