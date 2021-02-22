@@ -74,14 +74,14 @@ and is wrapped around the whole page content, except for the footer in this exam
 						</div>
 
 						<u1 class="w3-ul w3-hoverable w3-white"
-							th:each="points : ${leaderboard.keySet()}">
+							th:each="user : ${leaderboard.keySet()}">
 
 						<div class="w3-row w3-padding-8 w3-white">
 							<div class="w3-col s6 w3-center">
-								<p th:text="${leaderboard.get(points).getUsername()}">
+								<p th:text="${user.getUsername()}">
 							</div>
 							<div class="w3-col s6 w3-center">
-								<p th:text="${points}">
+								<p th:text="${leaderboard.get(user)}">
 							</div>
 						</div>
 

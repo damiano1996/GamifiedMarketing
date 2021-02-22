@@ -68,5 +68,10 @@ public class ProductService {
 	public Product getProductOfTheDay() {
 		return getProductByDate(new Date());
 	}
+	
+	public void deleteProduct(Date productDate) {
+		Product product = entityManager.find(Product.class, productDate);
+		entityManager.remove(product);
+	}
 
 }

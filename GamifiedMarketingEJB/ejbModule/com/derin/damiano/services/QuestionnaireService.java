@@ -1,7 +1,9 @@
 package com.derin.damiano.services;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.ejb.LocalBean;
@@ -145,7 +147,6 @@ public class QuestionnaireService {
 
 	public boolean isQuestionnaireSubmitted(Date productDate, int userId) {
 		Product product = entityManager.find(Product.class, productDate);
-//		User user = entityManager.find(User.class, userId);
 
 		// Since we have only one statisticaldata for each questionnaire we can check
 		// if there is one stored. If so, the questionnaire has been submitted.
@@ -156,12 +157,6 @@ public class QuestionnaireService {
 				return true;
 		}
 		return false;
-
-//		for (Answer answer : user.getAnswers()) {
-//			if (answer.getQuestion().getProduct().getDate().equals(product.getDate()))
-//				return true;
-//		}
-//		return false;
 	}
 
 	public ArrayList<User> getUsersWhoSubmitted(Date productDate) {
@@ -174,20 +169,6 @@ public class QuestionnaireService {
 			whoSubmitted.add(statisticaldata.getUser());
 		}
 		return whoSubmitted;
-
-//		List<User> users = null;
-//		try {
-//			users = entityManager.createNamedQuery("User.findAll", User.class).getResultList();
-//		} catch (PersistenceException e) {
-//		}
-//
-//		ArrayList<User> whoSubmitted = new ArrayList<>();
-//		for (User user : users) {
-//			if (isQuestionnaireSubmitted(productDate, user.getId())) {
-//				whoSubmitted.add(user);
-//			}
-//		}
-//		return whoSubmitted;
 	}
 
 	public ArrayList<User> getUserWhoCancelledQuestionnaire(Date productDate) {
@@ -238,10 +219,22 @@ public class QuestionnaireService {
 
 		ArrayList<Date> dates = new ArrayList<>();
 		for (Product product : products) {
-			// if (!DateUtils.isSameDay(product.getDate(), new Date()) && product.getDate().before(new Date()))
+			if (!DateUtils.isSameDay(product.getDate(), new Date()) && product.getDate().before(new Date()))
 				dates.add(product.getDate());
 		}
 		return dates;
+	}
+
+	public HashMap<String, Date> getAvailableDatesByString(String dateFormat) {
+		ArrayList<Date> availableDates = getAvailableQuestionnaires();
+		HashMap<String, Date> availableDatesByString = new HashMap<>();
+
+		for (Date date : availableDates) {
+			String dateString = new SimpleDateFormat(dateFormat).format(date);
+			availableDatesByString.put(dateString, date);
+			System.out.println(date + " : " + dateString);
+		}
+		return availableDatesByString;
 	}
 
 	private void isBadword(Answer answer) throws BadwordException {

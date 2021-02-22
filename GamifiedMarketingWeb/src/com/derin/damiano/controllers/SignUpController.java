@@ -17,6 +17,7 @@ import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
 import com.derin.damiano.entities.User;
+import com.derin.damiano.exceptions.UsernameInUseException;
 import com.derin.damiano.services.UserService;
 import com.derin.damiano.utils.ServletHandler;
 
@@ -59,10 +60,19 @@ public class SignUpController extends HttpServlet {
 			ctx.setVariable("message", "Missing or incorrect values.");
 			path = "/WEB-INF/message.html";
 		} else {
-			usrService.addUser(username, email, password, name, surname);
-			ctx.setVariable("message", "Registration completed successfully!");
+			try {
+				usrService.addUser(username, email, password, name, surname);
+				ctx.setVariable("message", "Registration completed successfully!");
+				path = "/WEB-INF/message.html";
 
-			path = "/WEB-INF/message.html";
+			} catch (UsernameInUseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				ctx.setVariable("message", "Username already in use.");
+
+				path = "/WEB-INF/message.html";
+			}
+
 		}
 
 		templateEngine.process(path, ctx, response.getWriter());

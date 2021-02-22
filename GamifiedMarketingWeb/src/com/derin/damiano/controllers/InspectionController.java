@@ -82,7 +82,8 @@ public class InspectionController extends HttpServlet {
 
 		if (user.isAdmin()) {
 
-			session.setAttribute("availableDatesByString", getAvailableDatesByString());
+			session.setAttribute("availableDatesByString",
+					questionnaireService.getAvailableDatesByString(CreationController.DATE_FORMAT));
 			path = "/WEB-INF/inspection.html";
 
 		} else {
@@ -165,18 +166,6 @@ public class InspectionController extends HttpServlet {
 
 		templateEngine.process(path, ctx, response.getWriter());
 
-	}
-
-	private HashMap<String, Date> getAvailableDatesByString() {
-		ArrayList<Date> availableDates = questionnaireService.getAvailableQuestionnaires();
-		HashMap<String, Date> availableDatesByString = new HashMap<>();
-
-		for (Date date : availableDates) {
-			String dateString = new SimpleDateFormat(CreationController.DATE_FORMAT).format(date);
-			availableDatesByString.put(dateString, date);
-			System.out.println(date + " : " + dateString);
-		}
-		return availableDatesByString;
 	}
 
 	public void destroy() {

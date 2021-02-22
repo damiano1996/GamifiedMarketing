@@ -9,6 +9,7 @@ import javax.persistence.PersistenceException;
 
 import com.derin.damiano.entities.LoginHistory;
 import com.derin.damiano.entities.User;
+import com.derin.damiano.exceptions.UsernameInUseException;
 
 @Stateless
 public class UserService {
@@ -18,8 +19,21 @@ public class UserService {
 	public UserService() {
 	}
 
-	public void addUser(String username, String email, String password, String name, String surname) {
-		entityManager.persist(new User(username, email, password, name, surname));
+	public void addUser(String username, String email, String password, String name, String surname)
+			throws UsernameInUseException {
+
+		User user = null;
+		try {
+
+			user = entityManager.createNamedQuery("User.findByUsername", User.class).setParameter(1, username)
+					.getSingleResult();
+		} catch (Exception e) {
+		}
+
+		if (user == null)
+			entityManager.persist(new User(username, email, password, name, surname));
+		else
+			throw new UsernameInUseException();
 	}
 
 	public User checkCredentials(String username, String password) {

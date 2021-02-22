@@ -12,6 +12,7 @@ import java.util.List;
 @Table(name = "usertable", schema = "db_gamified_marketing")
 @NamedQuery(name = "User.findAll", query = "SELECT u FROM User u")
 @NamedQuery(name = "User.checkCredentials", query = "SELECT u FROM User u WHERE u.username = ?1 AND u.password = ?2")
+@NamedQuery(name = "User.findByUsername", query = "SELECT u FROM User u WHERE u.username = ?1")
 public class User implements Serializable {
 	private static final long serialVersionUID = 1L;
 

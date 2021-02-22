@@ -7,7 +7,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.ejb.EJB;
@@ -29,11 +28,8 @@ import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
 import com.derin.damiano.entities.Answer;
-import com.derin.damiano.entities.Product;
-import com.derin.damiano.entities.Question;
+import com.derin.damiano.entities.Statisticaldata;
 import com.derin.damiano.entities.User;
-import com.derin.damiano.exceptions.BlockedException;
-import com.derin.damiano.services.LeaderboardService;
 import com.derin.damiano.services.ProductService;
 import com.derin.damiano.services.QuestionnaireService;
 import com.derin.damiano.services.UserService;
@@ -43,9 +39,9 @@ import com.derin.damiano.utils.ServletHandler;
 /**
  * Servlet implementation class CreationController
  */
-@WebServlet("/leaderboard")
+@WebServlet("/deletion")
 @MultipartConfig
-public class LeaderboardController extends HttpServlet {
+public class DeleteController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private TemplateEngine templateEngine;
 
@@ -58,13 +54,10 @@ public class LeaderboardController extends HttpServlet {
 	@EJB(name = "com.derin.damiano.services/QuestionnaireService")
 	private QuestionnaireService questionnaireService;
 
-	@EJB(name = "com.derin.damiano.services/LeaderboardService")
-	private LeaderboardService leaderboardService;
-
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
-	public LeaderboardController() {
+	public DeleteController() {
 		super();
 	}
 
@@ -81,20 +74,72 @@ public class LeaderboardController extends HttpServlet {
 			throws ServletException, IOException {
 
 		HttpSession session = request.getSession();
-		ServletContext servletContext = getServletContext();
-		WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
+		User user = (User) session.getAttribute("user");
 
-		Product product = (Product) session.getAttribute("product");
+		WebContext ctx = new WebContext(request, response, getServletContext(), request.getLocale());
 
-		Map<User, Integer> leaderboard = leaderboardService.getLeaderboard(product.getDate());
+		String path = null;
 
-		for (User u : leaderboard.keySet()) {
-			System.out.println("Points: " + leaderboard.get(u) + " username: " + u.getUsername());
+		if (user.isAdmin()) {
+
+			session.setAttribute("availableDatesByString",
+					questionnaireService.getAvailableDatesByString(CreationController.DATE_FORMAT));
+			path = "/WEB-INF/deletion.html";
+
+		} else {
+
+			ctx.setVariable("message", "Only administrators can perform this action!");
+			path = "/WEB-INF/message.html";
 		}
 
-		ctx.setVariable("leaderboard", leaderboard);
+		templateEngine.process(path, ctx, response.getWriter());
 
-		templateEngine.process("/WEB-INF/leaderboard.html", ctx, response.getWriter());
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
+		HttpSession session = request.getSession();
+		User user = (User) session.getAttribute("user");
+
+		WebContext ctx = new WebContext(request, response, getServletContext(), request.getLocale());
+
+		String path;
+		if (user.isAdmin()) {
+
+			String operation = request.getParameter("submit");
+			System.out.println("operation: " + operation);
+
+			if (operation.contains("Questionnaire")) {
+
+				String requestedDate = operation.replace("Questionnaire: ", "");
+				session.setAttribute("requestedDate", requestedDate);
+				System.out.println("Requested date: " + requestedDate);
+
+				HashMap<String, Date> availableDatesByString = (HashMap<String, Date>) session
+						.getAttribute("availableDatesByString");
+
+				Date questionnaireDateToDelete = availableDatesByString.get(requestedDate);
+				
+				// Deleting product and cascading all questions/answers/etc. that are related.
+				productService.deleteProduct(questionnaireDateToDelete);
+				
+				// updating the available dates.
+				session.setAttribute("availableDatesByString",
+						questionnaireService.getAvailableDatesByString(CreationController.DATE_FORMAT));
+
+			}
+
+			path = "/WEB-INF/deletion.html";
+
+		} else {
+
+			ctx.setVariable("message", "Only administrators can perform this action!");
+			path = "/WEB-INF/message.html";
+		}
+
+		templateEngine.process(path, ctx, response.getWriter());
+
 	}
 
 	public void destroy() {
