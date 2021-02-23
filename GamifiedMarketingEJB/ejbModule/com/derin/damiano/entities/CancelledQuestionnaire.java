@@ -28,7 +28,7 @@ public class CancelledQuestionnaire implements Serializable {
 
 	public CancelledQuestionnaire() {
 	}
-	
+
 	public CancelledQuestionnaire(Product product, User user) {
 		this.product = product;
 		this.user = user;

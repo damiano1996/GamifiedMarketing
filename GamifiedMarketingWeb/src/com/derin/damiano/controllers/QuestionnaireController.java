@@ -100,33 +100,33 @@ public class QuestionnaireController extends HttpServlet {
 
 		WebContext ctx = new WebContext(request, response, getServletContext(), request.getLocale());
 
-//		try {
+		try {
 
-		String operation = request.getParameter("submit");
+			String operation = request.getParameter("submit");
 
-		if (operation.equals("Next")) {
+			if (operation.equals("Next")) {
 
-			doNext(request, response, session, ctx);
+				doNext(request, response, session, ctx);
 
-		} else if (operation.equals("Submit")) {
+			} else if (operation.equals("Submit")) {
 
-			doSubmit(request, response, session, ctx);
+				doSubmit(request, response, session, ctx);
 
-		} else if (operation.equals("Previous")) {
+			} else if (operation.equals("Previous")) {
 
-			doPrevious(request, response, session, ctx);
+				doPrevious(request, response, session, ctx);
 
-		} else if (operation.equals("Cancel")) {
+			} else if (operation.equals("Cancel")) {
 
-			doCancel(request, response, session, ctx);
+				doCancel(request, response, session, ctx);
+
+			}
+
+		} catch (Exception e) {
+			ctx.setVariable("message", "Something went wrong with your questionnaire...");
+			templateEngine.process("/WEB-INF/message.html", ctx, response.getWriter());
 
 		}
-
-//		} catch (Exception e) {
-//			ctx.setVariable("message", "Something went wrong with your questionnaire...");
-//			templateEngine.process("/WEB-INF/message.html", ctx, response.getWriter());
-//
-//		}
 
 	}
 
@@ -134,9 +134,9 @@ public class QuestionnaireController extends HttpServlet {
 			throws IOException {
 
 		for (Answer answer : (ArrayList<Answer>) session.getAttribute("answers")) {
-			System.out.println("Ans question id: " + answer.getId().getQuestionId());
+//			System.out.println("Ans question id: " + answer.getId().getQuestionId());
 			String content = ServletHandler.getParameter(request, "" + answer.getId().getQuestionId());
-			System.out.println("Ans content: " + content);
+//			System.out.println("Ans content: " + content);
 			answer.setContent(content);
 		}
 

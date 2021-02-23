@@ -65,7 +65,7 @@ public class LogInController extends HttpServlet {
 
 		String username = ServletHandler.getParameter(request, "username");
 		String password = ServletHandler.getParameter(request, "password");
-		System.out.println(username + ":" + password);
+//		System.out.println(username + ":" + password);
 		if (username == null || password == null) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing credential value.");
 			return;

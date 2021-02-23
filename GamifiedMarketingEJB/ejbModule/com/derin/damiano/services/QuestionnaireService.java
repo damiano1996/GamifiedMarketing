@@ -85,8 +85,8 @@ public class QuestionnaireService {
 				isBadword(answer);
 
 				Question question = entityManager.find(Question.class, answer.getId().getQuestionId());
-				System.out.println("Question info: " + question.getId() + " - " + question.getContent());
-				System.out.println("Answer info: " + answer.getId().getQuestionId() + " - " + answer.getContent());
+//				System.out.println("Question info: " + question.getId() + " - " + question.getContent());
+//				System.out.println("Answer info: " + answer.getId().getQuestionId() + " - " + answer.getContent());
 
 				question.addAnswer(answer);
 				user.addAnswer(answer);
@@ -122,7 +122,7 @@ public class QuestionnaireService {
 		ArrayList<Answer> answers = new ArrayList<Answer>();
 		for (Question question : product.getQuestions()) {
 
-			System.out.println("Question info: " + question.getId() + " - " + question.getContent());
+//			System.out.println("Question info: " + question.getId() + " - " + question.getContent());
 			Answer answer = new Answer("", question, user);
 
 //			user.addAnswer(answer);
@@ -232,18 +232,18 @@ public class QuestionnaireService {
 		for (Date date : availableDates) {
 			String dateString = new SimpleDateFormat(dateFormat).format(date);
 			availableDatesByString.put(dateString, date);
-			System.out.println(date + " : " + dateString);
+//			System.out.println(date + " : " + dateString);
 		}
 		return availableDatesByString;
 	}
 
 	private void isBadword(Answer answer) throws BadwordException {
 
-		System.out.println("Answer under investigation: " + answer.getContent());
+//		System.out.println("Answer under investigation: " + answer.getContent());
 
 		List<Badword> badwords = entityManager.createNamedQuery("Badword.findAll", Badword.class).getResultList();
 		for (Badword badword : badwords) {
-			System.out.println("Checking bad word: " + badword.getWord());
+//			System.out.println("Checking bad word: " + badword.getWord());
 
 			if (answer.getContent().contains(badword.getWord()))
 				throw new BadwordException("Bad word detected: " + badword.getWord());

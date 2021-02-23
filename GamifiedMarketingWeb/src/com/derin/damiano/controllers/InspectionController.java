@@ -108,13 +108,13 @@ public class InspectionController extends HttpServlet {
 		if (user.isAdmin()) {
 
 			String operation = request.getParameter("submit");
-			System.out.println("operation: " + operation);
+//			System.out.println("operation: " + operation);
 
 			if (operation.contains("Questionnaire")) {
 
 				String requestedDate = operation.replace("Questionnaire: ", "");
 				session.setAttribute("requestedDate", requestedDate);
-				System.out.println("Requested date: " + requestedDate);
+//				System.out.println("Requested date: " + requestedDate);
 
 				HashMap<String, Date> availableDatesByString = (HashMap<String, Date>) session
 						.getAttribute("availableDatesByString");
@@ -125,9 +125,9 @@ public class InspectionController extends HttpServlet {
 
 				ArrayList<User> usersWhoCancelled = questionnaireService.getUserWhoCancelledQuestionnaire(date);
 				session.setAttribute("usersWhoCancelled", usersWhoCancelled);
-				for (User u : usersWhoCancelled) {
-					System.out.println("user who cancelled: " + u.getUsername());
-				}
+//				for (User u : usersWhoCancelled) {
+//					System.out.println("user who cancelled: " + u.getUsername());
+//				}
 
 				// resetting other attributes
 				session.setAttribute("marketingAnswers", null);
@@ -138,7 +138,7 @@ public class InspectionController extends HttpServlet {
 				String[] parts = operation.split(" ");
 				String userIdString = parts[1];
 				int userId = Integer.parseInt(userIdString);
-				System.out.println("Requested userId: " + userId);
+//				System.out.println("Requested userId: " + userId);
 
 				Date date = null;
 				try {

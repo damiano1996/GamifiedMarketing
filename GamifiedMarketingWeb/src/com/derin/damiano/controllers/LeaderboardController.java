@@ -88,9 +88,9 @@ public class LeaderboardController extends HttpServlet {
 
 		Map<User, Integer> leaderboard = leaderboardService.getLeaderboard(product.getDate());
 
-		for (User u : leaderboard.keySet()) {
-			System.out.println("Points: " + leaderboard.get(u) + " username: " + u.getUsername());
-		}
+//		for (User u : leaderboard.keySet()) {
+//			System.out.println("Points: " + leaderboard.get(u) + " username: " + u.getUsername());
+//		}
 
 		ctx.setVariable("leaderboard", leaderboard);
 

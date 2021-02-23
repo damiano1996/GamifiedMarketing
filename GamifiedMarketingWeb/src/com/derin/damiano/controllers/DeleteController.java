@@ -108,22 +108,22 @@ public class DeleteController extends HttpServlet {
 		if (user.isAdmin()) {
 
 			String operation = request.getParameter("submit");
-			System.out.println("operation: " + operation);
+//			System.out.println("operation: " + operation);
 
 			if (operation.contains("Questionnaire")) {
 
 				String requestedDate = operation.replace("Questionnaire: ", "");
 				session.setAttribute("requestedDate", requestedDate);
-				System.out.println("Requested date: " + requestedDate);
+//				System.out.println("Requested date: " + requestedDate);
 
 				HashMap<String, Date> availableDatesByString = (HashMap<String, Date>) session
 						.getAttribute("availableDatesByString");
 
 				Date questionnaireDateToDelete = availableDatesByString.get(requestedDate);
-				
+
 				// Deleting product and cascading all questions/answers/etc. that are related.
 				productService.deleteProduct(questionnaireDateToDelete);
-				
+
 				// updating the available dates.
 				session.setAttribute("availableDatesByString",
 						questionnaireService.getAvailableDatesByString(CreationController.DATE_FORMAT));

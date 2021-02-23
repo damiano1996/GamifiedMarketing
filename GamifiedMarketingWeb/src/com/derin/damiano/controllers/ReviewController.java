@@ -78,7 +78,7 @@ public class ReviewController extends HttpServlet {
 		WebContext ctx = new WebContext(request, response, getServletContext(), request.getLocale());
 
 		String reviewContent = ServletHandler.getParameter(request, "review_content");
-		System.out.println("New review: " + reviewContent);
+//		System.out.println("New review: " + reviewContent);
 
 		String path = null;
 		if (reviewContent != null) {
@@ -94,7 +94,7 @@ public class ReviewController extends HttpServlet {
 				session.setAttribute("product", product);
 
 				boolean hide = reviewService.isReviewSubmitted(product.getDate(), user.getId());
-				System.out.println("isReviewSubmitted: " + hide);
+//				System.out.println("isReviewSubmitted: " + hide);
 				session.setAttribute("hideReviewButton", hide);
 
 				path = "/WEB-INF/home.html";
