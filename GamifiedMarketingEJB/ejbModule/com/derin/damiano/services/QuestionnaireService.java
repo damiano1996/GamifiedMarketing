@@ -58,7 +58,7 @@ public class QuestionnaireService {
 				entityManager.flush();
 
 			} else {
-				throw new BlockedException("User has been already blocked.");
+				throw new BlockedException("User has already been blocked.");
 			}
 
 		} catch (BadwordException e) {

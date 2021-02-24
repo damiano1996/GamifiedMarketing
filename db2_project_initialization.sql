@@ -5,16 +5,16 @@ use `db_gamified_marketing`;
 set foreign_key_checks = 0;
 
 drop table if exists `UserTable`;
-create table `UserTable` (
-    `id` int not null auto_increment,
-    `username` varchar(45) not null,
-    `email` varchar(45) not null,
-    `password` varchar(45) not null,
-    `name` varchar(45) not null,
-    `surname` varchar(45) not null,
-    `admin` bool default false,
-    `blocked` bool default false,
-    primary key (`id`)
+CREATE TABLE `UserTable` (
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `username` VARCHAR(45) NOT NULL,
+    `email` VARCHAR(45) NOT NULL,
+    `password` VARCHAR(45) NOT NULL,
+    `name` VARCHAR(45) NOT NULL,
+    `surname` VARCHAR(45) NOT NULL,
+    `admin` BOOL DEFAULT FALSE,
+    `blocked` BOOL DEFAULT FALSE,
+    PRIMARY KEY (`id`)
 );
 
 insert into `UserTable` (`username`, `email`, `password`, `name`, `surname`, `admin`) values ('admin', 'admin@gamifiedmarketing.com', 'admin', 'admin', 'admin', true);
@@ -23,123 +23,124 @@ insert into `UserTable` (`username`, `email`, `password`, `name`, `surname`) val
 insert into `UserTable` (`username`, `email`, `password`, `name`, `surname`) values ('cc', 'cc@gamifiedmarketing.com', 'cc', 'cc', 'cc');
 
 drop table if exists `LogInHistory`;
-create table `LogInHistory` (
-	`user_id` int not null,
-    `date` datetime,
-    primary key (`user_id`, `date`),
-    foreign key (`user_id`)
-        references `UserTable` (`id`)
-        on delete cascade on update cascade
+CREATE TABLE `LogInHistory` (
+    `user_id` INT NOT NULL,
+    `date` DATETIME,
+    PRIMARY KEY (`user_id` , `date`),
+    FOREIGN KEY (`user_id`)
+        REFERENCES `UserTable` (`id`)
+        ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 drop table if exists `Product`;
-create table `Product` (
-    `date` date,
-    `name` varchar(255) not null,
-    `image` longblob,
-    primary key (`date`)
+CREATE TABLE `Product` (
+    `date` DATE,
+    `name` VARCHAR(255) NOT NULL,
+    `image` LONGBLOB,
+    PRIMARY KEY (`date`)
 );
 
 drop table if exists `Review`;
-create table `Review` (
-    `product_date` date not null,
-    `id_creator` int not null,
-    `content` text not null,
-    primary key (`product_date` , `id_creator`),
-    foreign key (`product_date`)
-        references `Product` (`date`)
-        on delete cascade on update cascade,
-    foreign key (`id_creator`)
-        references `UserTable` (`id`)
-        on delete cascade on update cascade
+CREATE TABLE `Review` (
+    `product_date` DATE NOT NULL,
+    `id_creator` INT NOT NULL,
+    `content` TEXT NOT NULL,
+    PRIMARY KEY (`product_date` , `id_creator`),
+    FOREIGN KEY (`product_date`)
+        REFERENCES `Product` (`date`)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (`id_creator`)
+        REFERENCES `UserTable` (`id`)
+        ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 drop table if exists `StatisticalData`;
-create table `StatisticalData` (
-    `product_date` date not null,
-    `user_id` int not null,
-    `age` int,
-    `sex` enum('M', 'F', 'O'),
-    `expertise_level` enum('low', 'medium', 'high'),
-    primary key (`product_date` , `user_id`),
-    foreign key (`product_date`)
-        references `Product` (`date`)
-        on delete cascade on update cascade,
-    foreign key (`user_id`)
-        references `UserTable` (`id`)
-        on delete cascade on update cascade
+CREATE TABLE `StatisticalData` (
+    `product_date` DATE NOT NULL,
+    `user_id` INT NOT NULL,
+    `age` INT,
+    `sex` ENUM('M', 'F', 'O'),
+    `expertise_level` ENUM('low', 'medium', 'high'),
+    PRIMARY KEY (`product_date` , `user_id`),
+    FOREIGN KEY (`product_date`)
+        REFERENCES `Product` (`date`)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (`user_id`)
+        REFERENCES `UserTable` (`id`)
+        ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 drop table if exists `Question`;
-create table `Question` (
-    `id` int not null auto_increment,
-    `product_date` date not null,
-    `content` text not null,
-    primary key (`id`),
-	foreign key (`product_date`)
-        references `Product` (`date`)
-        on delete cascade on update cascade
+CREATE TABLE `Question` (
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `product_date` DATE NOT NULL,
+    `content` TEXT NOT NULL,
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`product_date`)
+        REFERENCES `Product` (`date`)
+        ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 drop table if exists `Answer`;
-create table `Answer` (
-    `question_id` int not null,
-    `id_creator` int not null,
-    `content` text not null,
-    primary key (`question_id` , `id_creator`),
-    foreign key (`question_id`)
-        references `Question` (`id`)
-        on delete cascade on update cascade,
-    foreign key (`id_creator`)
-        references `UserTable` (`id`)
-        on delete cascade on update cascade
+CREATE TABLE `Answer` (
+    `question_id` INT NOT NULL,
+    `id_creator` INT NOT NULL,
+    `content` TEXT NOT NULL,
+    PRIMARY KEY (`question_id` , `id_creator`),
+    FOREIGN KEY (`question_id`)
+        REFERENCES `Question` (`id`)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (`id_creator`)
+        REFERENCES `UserTable` (`id`)
+        ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 drop table if exists `CancelledQuestionnaire`;
-create table `CancelledQuestionnaire` (
-	`id` int not null auto_increment,
-	`user_id` int not null,
-    `product_date` date not null,
-    primary key (`id`),
-	foreign key (`user_id`)
-		references `UserTable` (`id`)
-        on delete cascade on update cascade,
-	foreign key (`product_date`)
-		references `Product` (`date`)
-        on delete cascade on update cascade
+CREATE TABLE `CancelledQuestionnaire` (
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `user_id` INT NOT NULL,
+    `product_date` DATE NOT NULL,
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`user_id`)
+        REFERENCES `UserTable` (`id`)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (`product_date`)
+        REFERENCES `Product` (`date`)
+        ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 drop table if exists `GamificationPoint`;
-create table `GamificationPoint` (
-	`id` int not null auto_increment,
-	`user_id` int not null,
-    `product_date` date not null,
-    `points` int not null,
-    primary key (`id`),
-    foreign key (`user_id`)
-		references `UserTable` (`id`)
-        on delete cascade on update cascade,
-	foreign key (`product_date`)
-		references `Product` (`date`)
-        on delete cascade on update cascade
+CREATE TABLE `GamificationPoint` (
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `user_id` INT NOT NULL,
+    `product_date` DATE NOT NULL,
+    `points` INT NOT NULL,
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`user_id`)
+        REFERENCES `UserTable` (`id`)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (`product_date`)
+        REFERENCES `Product` (`date`)
+        ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 drop table if exists `Badword`;
-create table `Badword` (
-	`word` varchar(255) not null,
-    primary key (`word`)
+CREATE TABLE `Badword` (
+    `word` VARCHAR(255) NOT NULL,
+    PRIMARY KEY (`word`)
 );
 
-# ------------------------------------------------
-# ------------------- TRIGGERS -------------------
-# ------------------------------------------------
+CREATE 
+    TRIGGER  marketing_questionnaire_gamification_points
+ AFTER INSERT ON `Answer` FOR EACH ROW 
+    INSERT INTO `GamificationPoint` (`user_id` , `product_date` , `points`) VALUES (new.id_creator , (SELECT 
+            q.product_date
+        FROM
+            `Question` AS q
+        WHERE
+            q.id = new.question_id) , 1);
 
-create trigger marketing_questionnaire_gamification_points
-	after insert on `Answer`
-    for each row
-	insert into `GamificationPoint` (`user_id`, `product_date`, `points`) values (new.id_creator, (select q.product_date from `Question` as q where q.id = new.question_id), 1);
-
-create trigger statistical_questionnaire_sex_gamification_points
-	after insert on `StatisticalData`
-    for each row
-    insert into `GamificationPoint` (`user_id`, `product_date`, `points`) values (new.user_id, new.product_date, if(new.age != -1, 2, 0) + if(new.sex is not null, 2, 0) + if(new.expertise_level is not null, 2, 0));
+CREATE 
+    TRIGGER  statistical_questionnaire_sex_gamification_points
+ AFTER INSERT ON `StatisticalData` FOR EACH ROW 
+    INSERT INTO `GamificationPoint` (`user_id` , `product_date` , `points`) VALUES (new.user_id , new.product_date , IF(new.age != - 1, 2, 0) + IF(new.sex IS NOT NULL, 2, 0) + IF(new.expertise_level IS NOT NULL, 2, 0));
