@@ -47,3 +47,18 @@ given questionnaire include
   - A DELETION page for ERASING the questionnaire data and the related responses and points
 of all users who filled in the questionnaire. Deletion should be possible only for a date
 preceding the current date.
+
+## Hints:
+  - The ORM annotations should express a proper design of fetch, cascade and orphan control
+policies for relationships, considering the expected cardinality of associations.
+  - The software architecture should apply a proper division of responsibility of components in
+the various tiers: servlets, EJBs, entities, database triggers and constraints.
+
+## Technical Specifications
+The application should be realized with the following technologies:
+  - MySQL DBMS
+  - TomEE JEE application/web server
+  - Java servlet and templating (JSP, JSTL or Thymeleaf) for the user interface
+  - EJB (stateless or stateful) for the business objects
+  - JPA for object relational mapping and transaction management
+  - Triggers and constraints for database-level business constraints and rules.
