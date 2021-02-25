@@ -1,6 +1,8 @@
 # GamifiedMarketing
 DataBase2 course project - Politecnico di Milano
 
+![alt text](/images/homepage.png "Home Page")
+
 ## Functional Specifications
 An application deals with gamified consumer data collection. A user registers with a username, a
 password and an email. A registered user logs in and accesses a HOME PAGE where a “Questionnaire
